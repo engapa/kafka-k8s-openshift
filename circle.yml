@@ -10,7 +10,7 @@ dependencies:
 test:
   override:
     - >
-      docker run -it engapa/kafka /bin/bash -c \
+      docker run -it -e "DEBUG_SETUP=true" engapa/kafka /bin/bash -c \
       "bin/zookeeper-server-start.sh -daemon config/zookeeper.properties" \
        "&& bin/kafka-server-start.sh -daemon config/server.properties" \
        "&& bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic test --replication-factor 1 --partitions 1" \
