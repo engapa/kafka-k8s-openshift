@@ -7,7 +7,6 @@ ENV KAFKA_REPLICAS=1 \
     SCALA_VERSION="2.11" \
     KAFKA_HOME=/srv/kafka \
     PATH=${PATH}:${KAFKA_HOME}/bin \
-    DBEUG_SETUP=true \
     SERVER_LOG_DIRS=/kafka/kafka-logs \
     KAFKA_ZK_LOCAL=true \
     ZK_dataDir="/kafka/zookeeper/data" \
@@ -32,3 +31,5 @@ RUN set -x \
     && mv /kafka_* ${KAFKA_HOME}/bin
 
 WORKDIR ${KAFKA_HOME}
+
+ENTRYPOINT ["bin/kafka_setup.sh"]
