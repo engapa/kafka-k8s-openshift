@@ -11,8 +11,11 @@ test:
   override:
     - >
       docker run -it engapa/kafka /bin/bash -c
-      "bin/kafka_setup.sh && bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
-      && bin/kafka-server-start.sh -daemon config/server.properties"
+      "bin/kafka_setup.sh
+       && bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
+       && bin/kafka-server-start.sh -daemon config/server.properties
+       && bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic test --replication-factor 1 --partitions 1
+       && bin/kafka-topics.sh --list --zookeeper localhost:2181"
 
 deployment:
   hub:
