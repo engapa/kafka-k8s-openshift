@@ -54,16 +54,6 @@ function zk_local_cluster_setup() {
 
 }
 
-function print_zk_connect_list() {
-
-  for (( i=1; i<=$KAFKA_REPLICAS; i++ )); do
-    ZK_SERVER_PORT=${ZK_SERVER_PORT:-2888}
-    ZK_ELECTION_PORT=${ZK_ELECTION_PORT:-3888}
-    echo "$NAME-$((i-1)).$DOMAIN:$ZK_SERVER_PORT:$ZK_ELECTION_PORT"
-  done
-
-}
-
 function check_config() {
 
   if $KAFKA_ZK_LOCAL;then
