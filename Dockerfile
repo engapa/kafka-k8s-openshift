@@ -15,7 +15,7 @@ ENV KAFKA_REPLICAS=1 \
 
 VOLUME ["/kafka"]
 
-ADD kafka_download.sh kafka_setup.sh kafka_ok.sh /
+ADD kafka_download.sh kafka_setup.sh kafka_start.sh kafka_ok.sh /
 
 RUN set -x \
     && chmod a+x /kafka_* \
