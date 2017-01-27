@@ -41,12 +41,25 @@ function config_files() {
 
 }
 
-function print_zk_servers() {
+function zk_local_cluster_setup() {
 
   for (( i=1; i<=$KAFKA_REPLICAS; i++ )); do
     ZK_SERVER_PORT=${ZK_SERVER_PORT:-2888}
     ZK_ELECTION_PORT=${ZK_ELECTION_PORT:-3888}
-    echo "server.$i=$NAME-$((i-1)).$DOMAIN:$ZK_SERVER_PORT:$ZK_ELECTION_PORT"
+    echo "server.$i=$NAME-$((i-1)).$DOMAIN:$ZK_SERVER_PORT:$ZK_ELECTION_PORT" >> ${KAFKA_CONF_DIR}/zookeeper.properties
+    SERVER_ZOOKEEPER_CONNECT=$SERVER_ZOOKEEPER_CONNECT + "$NAME-$((i-1)).$DOMAIN:${ZK_clientPort};"
+  done
+
+  export SERVER_ZOOKEEPER_CONNECT=$SERVER_ZOOKEEPER_CONNECT
+
+}
+
+function print_zk_connect_list() {
+
+  for (( i=1; i<=$KAFKA_REPLICAS; i++ )); do
+    ZK_SERVER_PORT=${ZK_SERVER_PORT:-2888}
+    ZK_ELECTION_PORT=${ZK_ELECTION_PORT:-3888}
+    echo "$NAME-$((i-1)).$DOMAIN:$ZK_SERVER_PORT:$ZK_ELECTION_PORT"
   done
 
 }
@@ -61,6 +74,9 @@ function check_config() {
       unset ZK_HEAP_OPTS
     fi
     echo "unset KAFKA_HEAP_OPTS" >> ${KAFKA_HOME}/bin/zookeeper-server-start.sh
+    # Avoid a node list connection, then we should use local connection
+    export ZK_clientPort=${ZK_clientPort:-2181}
+    export SERVER_ZOOKEEPER_CONNECT="localhost:${ZK_clientPort}"
   fi
 
   if [ $KAFKA_REPLICAS -gt 1 ];then
@@ -69,7 +85,7 @@ function check_config() {
       ORD=${BASH_REMATCH[2]}
       export SERVER_BROKER_ID=$((ORD+1))
       if $KAFKA_ZK_LOCAL;then
-        print_zk_servers >> ${KAFKA_CONF_DIR}/zookeeper.properties
+        zk_local_cluster_setup
       fi
     else
      echo "Failed to extract ordinal from hostname $HOST"
