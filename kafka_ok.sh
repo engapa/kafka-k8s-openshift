@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 if $KAFKA_ZK_LOCAL;then
-  ZK_CLIENT_PORT=${ZK_CLIENT_PORT:-2181}
+  ZK_clientPort=${ZK_clientPort:-2181}
   OK=$(echo ruok | nc localhost $ZK_CLIENT_PORT)
   if [ "$OK" == "imok" ]; then
     eval `bin/kafka-topics.sh --zookeeper localhost:2181 --list`
