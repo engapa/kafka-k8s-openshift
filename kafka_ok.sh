@@ -4,7 +4,7 @@ if $KAFKA_ZK_LOCAL;then
   ZK_clientPort=${ZK_clientPort:-2181}
   OK=$(echo ruok | nc localhost $ZK_clientPort)
   if [ "$OK" == "imok" ]; then
-    eval `bin/kafka-topics.sh --zookeeper localhost:2181 --list`
+    eval `bin/kafka-topics.sh --zookeeper localhost:$ZK_clientPort --list`
     exit $?
   else
     exit 1
