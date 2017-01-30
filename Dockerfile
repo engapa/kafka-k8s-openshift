@@ -2,34 +2,42 @@ FROM java:8-jre-alpine
 
 MAINTAINER Enrique Garcia <engapa@gmail.com>
 
-ENV KAFKA_REPLICAS=1 \
-    KAFKA_VERSION="0.10.1.0" \
-    SCALA_VERSION="2.11" \
-    KAFKA_HOME=/srv/kafka \
-    PATH=${PATH}:${KAFKA_HOME}/bin \
-    SERVER_LOG_DIRS=/kafka/kafka-logs \
-    KAFKA_ZK_LOCAL=true \
-    ZK_dataDir="/kafka/zookeeper/data" \
-    ZK_dataLogDir="/kafka/zookeeper/log"
+ARG KAFKA_HOME=/opt/kafka
+ARG KAFKA_USER=kafka
+ARG KAFKA_GROUP=kafka
+ARG KAFKA_VERSION="0.10.1.1"
+ARG SCALA_VERSION="2.12"
 
+# Caution: Environment variable names are case sensitive (ZK_)
+ENV KAFKA_HOME=${KAFKA_HOME}              \
+    KAFKA_VERSION=${KAFKA_VERSION}        \
+    SCALA_VERSION=${SCALA_VERSION}        \
+    KAFKA_REPLICAS=1
 
-VOLUME ["/kafka"]
+# Required packages
+RUN set -x                                                           \
+    && apk add --update --no-cache                                   \
+       bash tar wget curl jq coreutils gnupg openssl ca-certificates
 
-ADD kafka_download.sh kafka_setup.sh kafka_start.sh kafka_ok.sh /
+# Download kafka distribution under KAFKA_HOME directory
+ADD kafka_download.sh /tmp/
 
-RUN set -x \
-    && chmod a+x /kafka_* \
-    && apk add --update --no-cache bash wget curl jq coreutils
+RUN set -x                              \
+    && mkdir -p $KAFKA_HOME             \
+    && chmod a+x /tmp/kafka_download.sh \
+    && /tmp/kafka_download.sh           \
+    && rm -rf /tmp/kafka_download.sh    \
+    && apk del gnupg jq wget
 
-RUN set -x \
-    && ./kafka_download.sh \
-    && rm -rf ${KAFKA_HOME}/NOTICE \
-    && rm -rf ${KAFKA_HOME}/LICENSE \
-    && rm -rf ${KAFKA_HOME}/site-docs \
-    && rm -rf ${KAFKA_HOME}/bin/windows \
-    && rm -rf /kafka_download.sh \
-    && mv /kafka_* ${KAFKA_HOME}/bin
+# Add custom scripts and configure user
+ADD kafka_setup.sh kafka_server.sh $KAFKA_HOME/bin/
 
-WORKDIR ${KAFKA_HOME}
+RUN set -x                                                                                    \
+    && chmod a+x $KAFKA_HOME/bin/kafka_*.sh                                                   \
+    && addgroup $KAFKA_GROUP                                                                  \
+    && adduser -h $KAFKA_HOME -g "kafka user" -s /sbin/nologin -D -G $KAFKA_GROUP $KAFKA_USER \
+    && chown -R $KAFKA_USER:$KAFKA_GROUP $KAFKA_HOME                                          \
+    && ln -s $KAFKA_HOME/bin/kafka_*.sh /usr/bin
 
-ENTRYPOINT ["bin/kafka_setup.sh"]
+USER $KAFKA_USER
+WORKDIR $KAFKA_HOME
