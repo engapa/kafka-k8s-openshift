@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-svc
+  labels:
+    app: kafka
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  ports:
+  - port: 9092
+    name: server
+  clusterIP: None
+  selector:
+    app: kafka
+---
+apiVersion: apps/v1alpha1
+kind: PetSet
+metadata:
+  name: kafka
+spec:
+  serviceName: kafka-svc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+        scheduler.alpha.kubernetes.io/affinity: >
+          {
+            "podAntiAffinity": {
+              "requiredDuringSchedulingIgnoredDuringExecution": [{
+                "labelSelector": {
+                  "matchExpressions": [{
+                    "key": "app",
+                    "operator": "In",
+                    "values": ["kafka"]
+                  }]
+                },
+                "topologyKey": "kubernetes.io/hostname"
+              }]
+            }
+          }
+        pod.alpha.kubernetes.io/init-containers: '[
+           {
+             "name": "remove-lost-found",
+             "image": "busybox",
+             "command": ["rmdir", "/opt/kafka/logs/lost+found", "/opt/kafka/zookeeper/lost+found"],
+             "volumeMounts": [
+               {
+                 "name": "kafka-logs",
+                 "mountPath": "/opt/kafka/logs"
+               },
+               {
+                 "name": "zookeeper-data",
+                 "mountPath": "/opt/kafka/zookeeper"
+               }
+             ]
+           }
+        ]'
+    spec:
+      containers:
+      - name: kafka
+        imagePullPolicy: Always
+        image: engapa/kafka:2.12-0.10.1.1
+#          resources:
+#            requests:
+#              memory: "2Gi"
+#              cpu: "1"
+          ports:
+          - containerPort: 9092
+            name: broker-port
+          env:
+          - name:  KAFKA_VERSION
+            value: 0.10.1.1
+          - name:  SCALA_VERSION
+            value: 2.12
+          - name : KAFKA_REPLICAS
+            value: 1
+          - name:  KAFKA_ZK_LOCAL
+            value: true
+          command:
+          - /bin/bash
+          - -c
+          - source bin/kafka_setup.sh && bin/kafka_server.sh start
+          readinessProbe:
+            exec:
+              command:
+              - kafka_server.sh
+              - status
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - kafka_server.sh
+              - status
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          volumeMounts:
+          - name: kafka-logs
+            mountPath: /opt/kafka/logs
+          - name: zookeeper-data
+            mountPath: /opt/kafka/zookeeper
+    volumeClaimTemplates:
+    - metadata:
+        name: kafka-logs
+        annotations:
+          volume.alpha.kubernetes.io/storage-class: anything
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: "10Gi"
+    - metadata:
+        name: zookeeper-data
+        annotations:
+          volume.alpha.kubernetes.io/storage-class: anything
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: "10Gi"
