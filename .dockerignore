@@ -1,0 +1,3 @@
+*.*
+!Dockerfile
+!kafka_*.sh
