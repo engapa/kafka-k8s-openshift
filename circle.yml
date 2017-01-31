@@ -1,24 +1,26 @@
 machine:
   services:
     - docker
+  env:
+   - SCALA_VERSION: "2.12"
+   - KAFKA_VERSION: "0.10.1.1"
 
 dependencies:
   override:
     - docker info
-    - docker build --rm=true -t engapa/kafka .
+    - docker build --rm=true -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 
 test:
   override:
     - >
-      docker run -it -e "DEBUG_SETUP=true" engapa/kafka /bin/bash -c \
-      "bin/zookeeper-server-start.sh -daemon config/zookeeper.properties" \
-       "&& bin/kafka-server-start.sh -daemon config/server.properties" \
-       "&& bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic test --replication-factor 1 --partitions 1" \
-      && exit `echo $?`
+      docker run -it -d --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c \
+      "source bin/kafka_setup.sh " \
+       "&& bin/kafka_server.sh start"
+    - docker exec -it kafka /bin/bash -c "kafka_server status"
 
 deployment:
   hub:
     branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker push engapa/kafka
+      - docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
