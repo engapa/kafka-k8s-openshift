@@ -13,10 +13,9 @@ dependencies:
 test:
   override:
     - >
-      docker run -it -d --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c \
+      docker run -it --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c \
       "source bin/kafka_setup.sh " \
-       "&& bin/kafka_server.sh start"
-    - docker exec -it kafka /bin/bash -c "kafka_server status"
+       "&& bin/kafka_server.sh start && bin/kafka_server.sh start"
 
 deployment:
   hub:
