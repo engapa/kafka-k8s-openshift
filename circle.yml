@@ -1,7 +1,7 @@
 machine:
   services:
-    - docker
-  env:
+   - docker
+  environment:
    - SCALA_VERSION: "2.12"
    - KAFKA_VERSION: "0.10.1.1"
 
