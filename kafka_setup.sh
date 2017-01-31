@@ -45,6 +45,11 @@ function config_files() {
 
 function zk_local_cluster_setup() {
 
+  # Required envs for replicated mode
+  export ZK_tickTime=${ZK_tickTime:-2000}
+  export ZK_initLimit=${ZK_initLimit:-5}
+  export ZK_syncLimit=${ZK_syncLimit:-2}
+
   for (( i=1; i<=$KAFKA_REPLICAS; i++ )); do
     ZK_SERVER_PORT=${ZK_SERVER_PORT:-2888}
     ZK_ELECTION_PORT=${ZK_ELECTION_PORT:-3888}
