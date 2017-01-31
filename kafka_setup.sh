@@ -3,6 +3,7 @@
 ### Default properties
 
 HOST=`hostname -s`
+DOMAIN=`hostname -d`
 KAFKA_HOME=${KAFKA_HOME:-/opt/kafka}
 KAFKA_CONF_DIR=$KAFKA_HOME/config
 DEBUG=${DEBUG_SETUP:-false}
@@ -53,8 +54,8 @@ function zk_local_cluster_setup() {
   for (( i=1; i<=$KAFKA_REPLICAS; i++ )); do
     ZK_SERVER_PORT=${ZK_SERVER_PORT:-2888}
     ZK_ELECTION_PORT=${ZK_ELECTION_PORT:-3888}
-    echo "server.$i=$NAME-$((i-1)):$ZK_SERVER_PORT:$ZK_ELECTION_PORT" >> ${KAFKA_CONF_DIR}/zookeeper.properties
-    SERVER_ZOOKEEPER_CONNECT=$SERVER_ZOOKEEPER_CONNECT + "$NAME-$((i-1)):$ZK_clientPort,"
+    echo "server.$i=$NAME-$((i-1)).$DOMAIN:$ZK_SERVER_PORT:$ZK_ELECTION_PORT" >> ${KAFKA_CONF_DIR}/zookeeper.properties
+    SERVER_ZOOKEEPER_CONNECT=$SERVER_ZOOKEEPER_CONNECT + "$NAME-$((i-1)).$DOMAIN:$ZK_clientPort,"
   done
 
   export SERVER_ZOOKEEPER_CONNECT=${SERVER_ZOOKEEPER_CONNECT::-1}
@@ -72,7 +73,7 @@ function check_config() {
   fi
 
   if [ $KAFKA_REPLICAS -gt 1 ];then
-    if [[ $HOST =~ (.*)-([0-9]+)(.*) ]]; then
+    if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
       NAME=${BASH_REMATCH[1]}
       ORD=${BASH_REMATCH[2]}
       SERVER_BROKER_ID=$((ORD+1))
