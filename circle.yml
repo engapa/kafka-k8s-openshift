@@ -1,9 +1,9 @@
 machine:
   services:
-   - docker
+  - docker
   environment:
-   - SCALA_VERSION: "2.12"
-   - KAFKA_VERSION: "0.10.1.1"
+    SCALA_VERSION: "2.12"
+    KAFKA_VERSION: "0.10.1.1"
 
 dependencies:
   override:
