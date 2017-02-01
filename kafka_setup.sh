@@ -22,10 +22,10 @@ function config_files() {
   PREFIX=LOG4J_ DEST_FILE=${KAFKA_CONF_DIR}/log4j.properties DEBUG=${DEBUG} env_vars_in_file
 
   # Consumer
-  PREFIX=CONSUMER_ DEST_FILE=${KAFKA_CONF_DIR}/log4j.properties DEBUG=${DEBUG} env_vars_in_file
+  PREFIX=CONSUMER_ DEST_FILE=${KAFKA_CONF_DIR}/consumer.properties DEBUG=${DEBUG} env_vars_in_file
 
   # Producer
-  PREFIX=PRODUCER_ DEST_FILE=${KAFKA_CONF_DIR}/log4j.properties DEBUG=${DEBUG} env_vars_in_file
+  PREFIX=PRODUCER_ DEST_FILE=${KAFKA_CONF_DIR}/producer.properties DEBUG=${DEBUG} env_vars_in_file
 
   # Zookeeper
   PREFIX=ZK_ DEST_FILE=${KAFKA_CONF_DIR}/zookeeper.properties LOWER=false EXLUSIONS=ZK_HEAP_OPTS DEBUG=${DEBUG} env_vars_in_file
