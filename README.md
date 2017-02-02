@@ -16,8 +16,8 @@ $docker build --build-arg SCALA_VERSION=$SCALA_VERSION --build-arg KAFKA_VERSION
 -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 ```
 
+The **kafka_download.sh** script is used to download the suitable release.
 The built docker image will contain a kafka distribution (${SCALA_VERSION}-${KAFKA_VERSION}) under the directory $KAFKA_HOME.
-**kafka_download.sh** scripts is used to download the suitable release.
 
 Besides, we've added two scripts more :
 
