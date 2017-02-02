@@ -71,12 +71,8 @@ spec:
           - containerPort: 9092
             name: broker-port
           env:
-          - name:  KAFKA_VERSION
-            value: 0.10.1.1
-          - name:  SCALA_VERSION
-            value: 2.12
           - name : KAFKA_REPLICAS
-            value: 1
+            value: 3
           - name:  KAFKA_ZK_LOCAL
             value: true
           command:
