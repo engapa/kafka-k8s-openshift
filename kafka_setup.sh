@@ -68,7 +68,7 @@ function zk_local_cluster_setup() {
 
 function check_config() {
 
-  SERVER_broker_id=0
+  export SERVER_broker_id=-1
 
   if $KAFKA_ZK_LOCAL;then
     export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
@@ -82,7 +82,7 @@ function check_config() {
     if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
       NAME=${BASH_REMATCH[1]}
       ORD=${BASH_REMATCH[2]}
-      SERVER_broker_id=$((ORD+1))
+      export SERVER_broker_id=$((ORD+1))
       if $KAFKA_ZK_LOCAL;then
         zk_local_cluster_setup
       fi
