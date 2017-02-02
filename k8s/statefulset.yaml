@@ -20,7 +20,7 @@ metadata:
   name: kafka
 spec:
   serviceName: kafka-svc
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -43,7 +43,7 @@ spec:
           }
         pod.alpha.kubernetes.io/init-containers: '[
            {
-             "name": "remove-lost-found",
+             "name": "clean-volumes",
              "image": "busybox",
              "command": ["rm", "-rf", "/opt/kafka/logs/*", "/opt/kafka/zookeeper/*"],
              "volumeMounts": [
@@ -67,53 +67,53 @@ spec:
             requests:
               memory: "2Gi"
               cpu: "1"
-          ports:
-          - containerPort: 9092
-            name: broker-port
-          env:
-          - name : KAFKA_REPLICAS
-            value: 3
-          - name:  KAFKA_ZK_LOCAL
-            value: true
-          command:
-          - /bin/bash
-          - -c
-          - source bin/kafka_setup.sh && bin/kafka_server.sh start
-          readinessProbe:
-            exec:
-              command:
-              - kafka_server.sh
-              - status
-            initialDelaySeconds: 15
-            timeoutSeconds: 5
-          livenessProbe:
-            exec:
-              command:
-              - kafka_server.sh
-              - status
-            initialDelaySeconds: 15
-            timeoutSeconds: 5
-          volumeMounts:
-          - name: kafka-logs
-            mountPath: /opt/kafka/logs
-          - name: zookeeper-data
-            mountPath: /opt/kafka/zookeeper
-    volumeClaimTemplates:
-    - metadata:
-        name: kafka-logs
-        annotations:
-          volume.alpha.kubernetes.io/storage-class: anything
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: "10Gi"
-    - metadata:
-        name: zookeeper-data
-        annotations:
-          volume.alpha.kubernetes.io/storage-class: anything
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: "10Gi"
+        ports:
+        - containerPort: 9092
+          name: broker-port
+        env:
+        - name: KAFKA_REPLICAS
+          value: "3"
+        - name: SERVER_zookeeper_connection_timeout_ms
+          value: "300000"
+        command:
+        - /bin/bash
+        - -c
+        - source bin/kafka_setup.sh && bin/kafka_server.sh start
+        readinessProbe:
+          exec:
+            command:
+            - kafka_server.sh
+            - status
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - kafka_server.sh
+            - status
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: kafka-logs
+          mountPath: /opt/kafka/logs
+        - name: zookeeper-data
+          mountPath: /opt/kafka/zookeeper
+  volumeClaimTemplates:
+  - metadata:
+      name: kafka-logs
+      annotations:
+        volume.alpha.kubernetes.io/storage-class: anything
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: "10Gi"
+  - metadata:
+      name: zookeeper-data
+      annotations:
+        volume.alpha.kubernetes.io/storage-class: anything
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: "10Gi"
