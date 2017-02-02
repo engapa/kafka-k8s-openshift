@@ -4,7 +4,7 @@
 [![Docker Layering](https://images.microbadger.com/badges/image/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
 # Kafka Docker Image
 
-The aim of this project is create kafka docker images.
+The aim of this project is create/use kafka docker images.
 
 # Build an image
 
@@ -31,7 +31,8 @@ This image hasn't neither `ENTRYPOINT` nor `CMD`, users are the responsible for 
 For example, let's create a container to run kafka and zookeeper all-in-one :
 
 ```bash
-docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c "source bin/kafka_setup.sh && bin/kafka_server.sh start"
+docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} \
+ /bin/bash -c "source bin/kafka_setup.sh && bin/kafka_server.sh start"
 Writing environment variables to file :
 
 PREFIX           : SERVER_
@@ -79,7 +80,7 @@ LOWER            : false
 
 Users can pass parameters to config files just adding environment variables with specific name patterns.
 
-This table collects patterns of names for each file:
+This table collects the patterns of variable names which will are written in each file:
 
 PREFIX     | FILE (${KAFKA_HOME}/config) |         Example
 -----------|-----------------------------|-----------------------------
@@ -97,7 +98,7 @@ CONN_LOG4J_ | connect-log4j.properties | CONN_LOG4J_log4j_rootLogger=INFO, stdou
 CONN_STANDALONE_ | connect-standalone.properties | CONN_STANDALONE_bootstrap_servers=localhost:9092 --> bootstrap.servers=localhost:9092
 TOOLS_LOG4J_ | tools-log4j.properties | TOOLS_LOG4J_log4j_appender_stderr_Target=System.err --> log4j.appender.stderr.Target=System.err
 
-So we can configure our kafka in docker run time :
+So we can configure our kafka server in docker run time :
 
 ```bash
 $docker run -it -d -e "LOG4J_log4j_rootLogger=DEBUG, stdout" -e "SERVER_log_retention_hours=24"\
