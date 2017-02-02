@@ -129,7 +129,7 @@ engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c "source bin/kafka_se
 
 # k8s
 
-In k8s directory there are some examples and utilities for Kubernetes
+In [k8s directory](k8s) there are some examples and utilities for Kubernetes
 
 # Author
 

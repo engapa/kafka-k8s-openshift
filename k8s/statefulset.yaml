@@ -14,8 +14,8 @@ spec:
   selector:
     app: kafka
 ---
-apiVersion: apps/v1alpha1
-kind: PetSet
+apiVersion: apps/v1beta1
+kind: StatefulSet
 metadata:
   name: kafka
 spec:
@@ -26,7 +26,6 @@ spec:
       labels:
         app: kafka
       annotations:
-        pod.alpha.kubernetes.io/initialized: "true"
         scheduler.alpha.kubernetes.io/affinity: >
           {
             "podAntiAffinity": {
@@ -46,7 +45,7 @@ spec:
            {
              "name": "remove-lost-found",
              "image": "busybox",
-             "command": ["rmdir", "/opt/kafka/logs/lost+found", "/opt/kafka/zookeeper/lost+found"],
+             "command": ["rm", "-rf", "/opt/kafka/logs/*", "/opt/kafka/zookeeper/*"],
              "volumeMounts": [
                {
                  "name": "kafka-logs",
@@ -64,10 +63,10 @@ spec:
       - name: kafka
         imagePullPolicy: Always
         image: engapa/kafka:2.12-0.10.1.1
-#          resources:
-#            requests:
-#              memory: "2Gi"
-#              cpu: "1"
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
           ports:
           - containerPort: 9092
             name: broker-port
