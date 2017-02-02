@@ -53,11 +53,13 @@ function zk_local_cluster_setup() {
   export ZK_initLimit=${ZK_initLimit:-5}
   export ZK_syncLimit=${ZK_syncLimit:-2}
 
+  SERVER_zookeeper_connect=''
+
   for (( i=1; i<=$KAFKA_REPLICAS; i++ )); do
     ZK_server_port=${ZK_server_port:-2888}
     ZK_election_port=${ZK_election_port:-3888}
     echo "server.$i=$NAME-$((i-1)).$DOMAIN:$ZK_server_port:$ZK_election_port" >> ${KAFKA_CONF_DIR}/zookeeper.properties
-    SERVER_zookeeper_connect=$SERVER_zookeeper_connect + "$NAME-$((i-1)).$DOMAIN:$ZK_clientPort,"
+    SERVER_zookeeper_connect=${SERVER_zookeeper_connect}"$NAME-$((i-1)).$DOMAIN:$ZK_clientPort,"
   done
 
   export SERVER_zookeeper_connect=${SERVER_zookeeper_connect::-1}
@@ -65,6 +67,8 @@ function zk_local_cluster_setup() {
 }
 
 function check_config() {
+
+  SERVER_broker_id=0
 
   if $KAFKA_ZK_LOCAL;then
     export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
@@ -89,16 +93,12 @@ function check_config() {
   fi
 
   if $KAFKA_ZK_LOCAL;then
-    echo "${SERVER_broker_id:-0}" >> ${ZK_dataDir}/myid
+    echo "${SERVER_broker_id}" >> ${ZK_dataDir}/myid
     if [ ! -z $ZOO_HEAP_OPTS ]; then
       sed -r -i "s/(export KAFKA_HEAP_OPTS)=\"(.*)\"/\1=\"$ZOO_HEAP_OPTS\"/g" ${KAFKA_HOME}/bin/zookeeper-server-start.sh
       unset ZOO_HEAP_OPTS
     fi
     echo "unset KAFKA_HEAP_OPTS" >> ${KAFKA_HOME}/bin/zookeeper-server-start.sh
-  fi
-
-  if [[ -z "$SERVER_broker_id" ]]; then
-    export SERVER_broker_id=-1
   fi
 
 }
