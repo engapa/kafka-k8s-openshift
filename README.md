@@ -118,12 +118,12 @@ This behaviour is managed by env KAFKA_ZK_LOCAL (whit **true** as default value)
 If you want to deploy a kafka server w/o localzookeeper the you should provide these env values:
 
 * KAFKA_ZK_LOCAL=false
-* SERVER_zookeeper_connect=\<zookeeper_host:zookeeper_port\>\[\,<zookeeper_host:zookeeper_port\>\]
+* SERVER_zookeeper_connect=\<zookeeper_host:zookeeper_port\>\[,\<zookeeper_host:zookeeper_port\>\]
 
 For instance :
 
 ```bash
-$docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_CONNECT_ZOOKEEPER=zookeeperserver1:2181,zookeeperserver2:2181,zookeeperserver3:2181" \
+$docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_zookeeper_connect=zookeeperserver1:2181,zookeeperserver2:2181,zookeeperserver3:2181" \
 engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c "source bin/kafka_setup.sh && bin/kafka_server.sh start"
 ```
 
