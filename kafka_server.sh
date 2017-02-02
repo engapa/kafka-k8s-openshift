@@ -83,7 +83,7 @@ function status() {
     eval `timeout 10 bin/kafka-topics.sh --zookeeper localhost:$ZK_clientPort --list`
     return $?
   else
-    eval `timeout 10 bin/kafka-topics.sh --zookeeper $SERVER_ZOOKEEPER_CONNECT --list`
+    eval `timeout 10 bin/kafka-topics.sh --zookeeper $SERVER_zookeeper_connect --list`
     return $?
   fi
 
