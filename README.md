@@ -12,7 +12,7 @@ The aim of this project is create kafka docker images.
 export KAFKA_HOME="/opt/kafka"
 export SCALA_VERSION="2.12"
 export KAFKA_VERSION="0.10.1.1"
-$docker build --build-arg SCALA_VERSION=$SCALA_VERSION --build-arg KAFKA_VERSION=$KAFKA_VERSION \
+$docker build --build-arg SCALA_VERSION=$SCALA_VERSION --build-arg KAFKA_VERSION=$KAFKA_VERSION --build-arg KAFKA_HOME=$KAFKA_HOME \
 -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 ```
 
