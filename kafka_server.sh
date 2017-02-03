@@ -80,10 +80,10 @@ function status() {
 
   if $KAFKA_ZK_LOCAL;then
     ZK_clientPort=${ZK_clientPort:-2181}
-    timeout 10 bin/kafka-topics.sh --zookeeper localhost:$ZK_clientPort --list
+    timeout 10 bin/kafka-topics.sh --zookeeper localhost:$ZK_clientPort --list > /dev/null 2>&1
     return $?
   else
-    timeout 10 bin/kafka-topics.sh --zookeeper $SERVER_zookeeper_connect --list
+    timeout 10 bin/kafka-topics.sh --zookeeper $SERVER_zookeeper_connect --list > /dev/null 2>&1
     return $?
   fi
 
