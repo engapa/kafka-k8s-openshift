@@ -68,16 +68,6 @@ function zk_local_cluster_setup() {
 
 function check_config() {
 
-  export SERVER_broker_id=-1
-
-  if $KAFKA_ZK_LOCAL;then
-    export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
-    export ZK_dataLogDir=${ZK_dataLogDir:-$KAFKA_HOME/zookeeper/data-log}
-    mkdir -p ${ZK_dataDir} ${ZK_dataLogDir}
-    export ZK_clientPort=${ZK_clientPort:-2181}
-    export SERVER_zookeeper_connect=${SERVER_zookeeper_connect:-"localhost:${ZK_clientPort}"}
-  fi
-
   if [ $KAFKA_REPLICAS -gt 1 ];then
     if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
       NAME=${BASH_REMATCH[1]}
@@ -86,19 +76,28 @@ function check_config() {
       if $KAFKA_ZK_LOCAL;then
         zk_local_cluster_setup
       fi
-    else
-     echo "Failed to extract ordinal from hostname $HOST"
-     exit 1
+    elif $KAFKA_ZK_LOCAL; then
+      echo "Unable to create local Zookeeper. Name of host doesn't match with pattern: (.*)-([0-9]+). Consider using PetSets or StatefulSets."
+      exit 1
     fi
   fi
 
   if $KAFKA_ZK_LOCAL;then
-    echo "${SERVER_broker_id}" >> ${ZK_dataDir}/myid
+    export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
+    export ZK_dataLogDir=${ZK_dataLogDir:-$KAFKA_HOME/zookeeper/data-log}
+    mkdir -p ${ZK_dataDir} ${ZK_dataLogDir}
+    export ZK_clientPort=${ZK_clientPort:-2181}
+    export SERVER_zookeeper_connect=${SERVER_zookeeper_connect:-"localhost:${ZK_clientPort}"}
+    echo "${SERVER_broker_id:-0}" >> ${ZK_dataDir}/myid
     if [ ! -z $ZOO_HEAP_OPTS ]; then
       sed -r -i "s/(export KAFKA_HEAP_OPTS)=\"(.*)\"/\1=\"$ZOO_HEAP_OPTS\"/g" ${KAFKA_HOME}/bin/zookeeper-server-start.sh
       unset ZOO_HEAP_OPTS
     fi
     echo "unset KAFKA_HEAP_OPTS" >> ${KAFKA_HOME}/bin/zookeeper-server-start.sh
+  fi
+
+  if [ -z $SERVER_broker_id ]; then
+    export SERVER_broker_id=-1
   fi
 
 }
