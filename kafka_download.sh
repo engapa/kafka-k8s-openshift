@@ -10,24 +10,22 @@ function download_kafka_release () {
     echo 'KAFKA_VERSION, SCALA_VERSION and KAFKA_HOME are required values.' && exit 1;
   fi
 
+  URL_PREFIX="https://dist.apache.org/repos/dist/release/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}"
+
+  wget -q -O /tmp/kafka.tgz "${URL_PREFIX}.tgz"
+  wget -q -O /tmp/kafka.asc "${URL_PREFIX}.tgz.asc"
+
   wget -q -O /tmp/KEYS https://kafka.apache.org/KEYS
   gpg -q --import /tmp/KEYS
-  wget -q -O /tmp/kafka.asc \
-    "https://dist.apache.org/repos/dist/release/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz.asc"
-
-  mirror=$(curl --stderr /dev/null https://www.apache.org/dyn/closer.cgi\?as_json\=1 | jq -r '.preferred')
-  url="${mirror}kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz"
-  wget -q -O "/tmp/kafka.tgz" "${url}"
 
   gpg -q --verify /tmp/kafka.asc /tmp/kafka.tgz
   tar -xzf /tmp/kafka.tgz --strip-components 1 -C $KAFKA_HOME
 
-  rm -rf /tmp/kafka.{asc,tgz}
-  rm -rf /tmp/KEYS
-  rm -rf $KAFKA_HOME/NOTICE
-  rm -rf $KAFKA_HOME/LICENSE
-  rm -rf $KAFKA_HOME/site-docs
-  rm -rf $KAFKA_HOME/bin/windows
+  rm -rf /tmp/kafka.{asc,tgz} \
+         /tmp/KEYS
+  rm -rf $KAFKA_HOME/{NOTICE,LICENSE} \
+         $KAFKA_HOME/site-docs \
+         $KAFKA_HOME/bin/windows
 
 }
 
