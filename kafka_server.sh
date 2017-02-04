@@ -53,7 +53,7 @@ function stop() {
     fi
   fi
 
-  sleep 2
+  sleep 5
   COUNT_DOWN=0
 
   until [[ ! $COUNT_DOWN -lt 10 ]]; do
@@ -64,12 +64,12 @@ function stop() {
     elif [[ $COUNT_DOWN -lt 9 ]]; then
       echo "(${COUNT_DOWN}) Trying stop processes: ${KAFKA_JAVA_PIDS}"
       kill -s TERM $KAFKA_JAVA_PIDS
-      sleep 2
     else
       echo "(${COUNT_DOWN}) Killing processes: ${KAFKA_JAVA_PIDS}"
       kill -s KILL $KAFKA_JAVA_PIDS
     fi
     COUNT_DOWN=`expr $COUNT_DOWN + 1`
+    sleep 3
   done
 
   return 1
@@ -78,14 +78,14 @@ function stop() {
 
 function status() {
 
-  if $KAFKA_ZK_LOCAL;then
-    ZK_clientPort=${ZK_clientPort:-2181}
-    timeout 10 bin/kafka-topics.sh --zookeeper localhost:$ZK_clientPort --list > /dev/null 2>&1
-    return $?
-  else
-    timeout 10 bin/kafka-topics.sh --zookeeper $SERVER_zookeeper_connect --list > /dev/null 2>&1
-    return $?
+  ZK_clientPort=${ZK_clientPort:-2181}
+  ZOOKEEPER_PARAM="localhost:${ZK_clientPort}"
+  if ! $KAFKA_ZK_LOCAL;then
+    ZOOKEEPER_PARAM=${SERVER_zookeeper_connect:-$ZOOKEEPER_PARAM}
   fi
+
+  timeout -t 10 bin/kafka-topics.sh --zookeeper $ZOOKEEPER_PARAM --list > /dev/null 2>&1
+  return $?
 
 }
 
