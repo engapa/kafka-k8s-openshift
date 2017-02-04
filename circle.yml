@@ -15,7 +15,7 @@ test:
     - >
       docker run -it -d --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c \
       "source bin/kafka_setup.sh && bin/kafka_server.sh start"
-    - if [ $(docker inspect -f {{.State.Running}} kafka) == 'true' ]; then exit 0; else exit 1; fi
+    - if [ $(docker inspect -f {{.State.Running}} kafka) == 'true' ]; then sleep 6 && exit 0; else exit 1; fi
     - sudo lxc-attach -n "$(docker inspect --format "{{.Id}}" kafka)" -- /bin/bash -c "/opt/kafka/bin/kafka_server.sh status" && exit $?
     - docker stop kafka
 
