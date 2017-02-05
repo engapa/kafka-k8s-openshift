@@ -26,13 +26,13 @@ Besides, we've added two scripts more :
 
 # Run a container
 
-This image hasn't neither `ENTRYPOINT` nor `CMD`, users are the responsible for launching any command when they are going to run the container.
+This image hasn't any `CMD` entry, users are the responsible for launching any command when they are going to run the container.
 
 For example, let's create a container to run kafka and zookeeper all-in-one :
 
 ```bash
 docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} \
- /bin/bash -c "source bin/kafka_setup.sh && bin/kafka_server.sh start"
+ /bin/bash -c "kafka_setup.sh && kafka_server.sh start"
 Writing environment variables to file :
 
 PREFIX           : SERVER_
@@ -102,12 +102,23 @@ So we can configure our kafka server in docker run time :
 
 ```bash
 $docker run -it -d -e "LOG4J_log4j_rootLogger=DEBUG, stdout" -e "SERVER_log_retention_hours=24"\
-engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c "source bin/kafka_setup.sh && bin/kafka_server.sh start"
+engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c "kafka_setup.sh && kafka_server.sh start"
 ```
 
 Also you may use `--env-file` option to load these variables from a file.
 
 And , of course, you could provide your own properties files directly by option `-v` and don't use kafka_setup and kafka_server scripts.
+
+The override option of kafka server is preserved and can used by you :
+
+```bash
+docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} \
+ /bin/bash -c "kafka_setup.sh && kafka_server.sh start --override advertised.host.name=blablabla"
+ [2017-02-04 19:06:10,504] INFO KafkaConfig values:
+	advertised.host.name = blablabla
+...
+[2017-02-04 19:06:11,693] INFO [Kafka Server 1001], started (kafka.server.KafkaServer)
+```
 
 ### Run local zookeeper
 
@@ -125,7 +136,7 @@ For instance :
 
 ```bash
 $docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_zookeeper_connect=zookeeperserver1:2181,zookeeperserver2:2181,zookeeperserver3:2181" \
-engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c "source bin/kafka_setup.sh && bin/kafka_server.sh start"
+engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c "kafka_setup.sh && kafka_server.sh start"
 ```
 
 # k8s

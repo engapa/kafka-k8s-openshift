@@ -30,14 +30,16 @@ RUN set -x \
     && apk del gnupg wget
 
 # Add custom scripts and configure user
-ADD kafka_setup.sh kafka_server.sh $KAFKA_HOME/bin/
+ADD kafka_setup.sh kafka_server.sh kafka_env.sh $KAFKA_HOME/bin/
 
 RUN set -x \
     && chmod a+x $KAFKA_HOME/bin/kafka_*.sh \
     && addgroup $KAFKA_GROUP \
-    && adduser -h $KAFKA_HOME -g "kafka user" -s /sbin/nologin -D -G $KAFKA_GROUP $KAFKA_USER \
+    && adduser -h $KAFKA_HOME -g "Kafka user" -s /sbin/nologin -D -G $KAFKA_GROUP $KAFKA_USER \
     && chown -R $KAFKA_USER:$KAFKA_GROUP $KAFKA_HOME \
     && ln -s $KAFKA_HOME/bin/kafka_*.sh /usr/bin
 
 USER $KAFKA_USER
 WORKDIR $KAFKA_HOME
+
+ENTRYPOINT ["kafka_env.sh"]
