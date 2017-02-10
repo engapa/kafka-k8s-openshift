@@ -18,7 +18,7 @@ function download_kafka_release () {
   wget -q -O /tmp/KEYS https://kafka.apache.org/KEYS
   gpg -q --import /tmp/KEYS
 
-  gpg -q --verify /tmp/kafka.asc /tmp/kafka.tgz
+  gpg -q --batch --verify /tmp/kafka.asc /tmp/kafka.tgz
   tar -xzf /tmp/kafka.tgz --strip-components 1 -C $KAFKA_HOME
 
   rm -rf /tmp/kafka.{asc,tgz} \
