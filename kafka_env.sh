@@ -22,7 +22,7 @@ function zk_local_cluster() {
 
   for (( i=1; i<=$KAFKA_REPLICAS; i++ )); do
     export ZK_server_$i="$NAME-$((i-1)).$DOMAIN:$ZK_server_port:$ZK_election_port"
-    SERVER_zookeeper_connect=${SERVER_zookeeper_connect}"$NAME-$((i-1)).$DOMAIN:$ZK_clientPort,"
+    SERVER_zookeeper_connect=${SERVER_zookeeper_connect}"$NAME-$((i-1)).$DOMAIN:${ZK_clientPort},"
   done
 
   export SERVER_zookeeper_connect=${SERVER_zookeeper_connect::-1}
@@ -35,7 +35,6 @@ DOMAIN=`hostname -d`
 if $KAFKA_ZK_LOCAL;then
   export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
   export ZK_dataLogDir=${ZK_dataLogDir:-$KAFKA_HOME/zookeeper/data-log}
-  mkdir -p ${ZK_dataDir} ${ZK_dataLogDir}
   export ZK_clientPort=${ZK_clientPort:-2181}
   export SERVER_zookeeper_connect=${SERVER_zookeeper_connect:-"localhost:${ZK_clientPort}"}
 fi

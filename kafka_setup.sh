@@ -47,6 +47,7 @@ function config_files() {
 function check_config() {
 
   if $KAFKA_ZK_LOCAL;then
+    mkdir -p ${ZK_dataDir} ${ZK_dataLogDir}
     echo "${SERVER_broker_id:-0}" >> $ZK_dataDir/myid
     if [[ "x$ZOO_HEAP_OPTS" != "x" ]]; then
       sed -r -i "s/(export KAFKA_HEAP_OPTS)=\"(.*)\"/\1=\"$ZOO_HEAP_OPTS\"/g" ${KAFKA_HOME}/bin/zookeeper-server-start.sh
