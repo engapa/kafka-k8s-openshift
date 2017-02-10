@@ -41,23 +41,6 @@ spec:
               }]
             }
           }
-        pod.alpha.kubernetes.io/init-containers: '[
-           {
-             "name": "clean-volumes-lost-found",
-             "image": "busybox",
-             "command": ["rmdir", "/opt/kafka/logs/lost+found", "/opt/kafka/zookeeper/lost+found"],
-             "volumeMounts": [
-               {
-                 "name": "kafka-logs",
-                 "mountPath": "/opt/kafka/logs"
-               },
-               {
-                 "name": "zookeeper-data",
-                 "mountPath": "/opt/kafka/zookeeper"
-               }
-             ]
-           }
-        ]'
     spec:
       containers:
       - name: kafka
@@ -73,19 +56,19 @@ spec:
         env:
         - name: KAFKA_REPLICAS
           value: "3"
-        - name: SERVER_zookeeper_connection_timeout_ms
-          value: "300000"
+        - name: SERVER_log_dirs
+            value: "/opt/kafka/data/logs"
         command:
         - /bin/bash
         - -c
-        - source bin/kafka_setup.sh && bin/kafka_server.sh start
-        readinessProbe:
-          exec:
-            command:
-            - kafka_server.sh
-            - status
-          initialDelaySeconds: 15
-          timeoutSeconds: 5
+        - source kafka_env.sh && kafka_setup.sh && kafka_server.sh start
+#        readinessProbe:
+#          exec:
+#            command:
+#            - kafka_server.sh
+#            - status
+#          initialDelaySeconds: 15
+#          timeoutSeconds: 5
         livenessProbe:
           exec:
             command:
@@ -94,13 +77,13 @@ spec:
           initialDelaySeconds: 15
           timeoutSeconds: 5
         volumeMounts:
-        - name: kafka-logs
-          mountPath: /opt/kafka/logs
+        - name: kafka-data
+          mountPath: /opt/kafka/data
         - name: zookeeper-data
           mountPath: /opt/kafka/zookeeper
   volumeClaimTemplates:
   - metadata:
-      name: kafka-logs
+      name: kafka-data
       annotations:
         volume.alpha.kubernetes.io/storage-class: anything
     spec:
