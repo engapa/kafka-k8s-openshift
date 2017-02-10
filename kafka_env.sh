@@ -22,7 +22,7 @@ function zk_local_cluster() {
 
   for (( i=1; i<=$KAFKA_REPLICAS; i++ )); do
     export ZK_server_$i="$NAME-$((i-1)).$DOMAIN:$ZK_server_port:$ZK_election_port"
-    SERVER_zookeeper_connect=${SERVER_zookeeper_connect}"$NAME-$((i-1)).$DOMAIN:${ZK_clientPort},"
+    SERVER_zookeeper_connect=${SERVER_zookeeper_connect}"$NAME-$((i-1)).$DOMAIN:"${ZK_clientPort}","
   done
 
   export SERVER_zookeeper_connect=${SERVER_zookeeper_connect::-1}
