@@ -43,9 +43,9 @@ spec:
           }
         pod.alpha.kubernetes.io/init-containers: '[
            {
-             "name": "clean-volumes",
+             "name": "clean-volumes-lost-found",
              "image": "busybox",
-             "command": ["rm", "-rf", "/opt/kafka/logs/*", "/opt/kafka/zookeeper/*"],
+             "command": ["rmdir", "/opt/kafka/logs/lost+found", "/opt/kafka/zookeeper/lost+found"],
              "volumeMounts": [
                {
                  "name": "kafka-logs",
