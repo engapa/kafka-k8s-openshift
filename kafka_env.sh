@@ -32,6 +32,14 @@ function zk_local_cluster() {
 HOST=`hostname -s`
 DOMAIN=`hostname -d`
 
+if $KAFKA_ZK_LOCAL;then
+  export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
+  export ZK_dataLogDir=${ZK_dataLogDir:-$KAFKA_HOME/zookeeper/data-log}
+  mkdir -p ${ZK_dataDir} ${ZK_dataLogDir}
+  export ZK_clientPort=${ZK_clientPort:-2181}
+  export SERVER_zookeeper_connect=${SERVER_zookeeper_connect:-"localhost:${ZK_clientPort}"}
+fi
+
 if [ $KAFKA_REPLICAS -gt 1 ];then
   if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
     NAME=${BASH_REMATCH[1]}
@@ -44,14 +52,6 @@ if [ $KAFKA_REPLICAS -gt 1 ];then
     echo "Unable to create local Zookeeper. Name of host doesn't match with pattern: (.*)-([0-9]+). Consider using PetSets or StatefulSets."
     exit 1
   fi
-fi
-
-if $KAFKA_ZK_LOCAL;then
-  export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
-  export ZK_dataLogDir=${ZK_dataLogDir:-$KAFKA_HOME/zookeeper/data-log}
-  mkdir -p ${ZK_dataDir} ${ZK_dataLogDir}
-  export ZK_clientPort=${ZK_clientPort:-2181}
-  export SERVER_zookeeper_connect=${SERVER_zookeeper_connect:-"localhost:${ZK_clientPort}"}
 fi
 
 if [ -z $SERVER_broker_id ]; then
