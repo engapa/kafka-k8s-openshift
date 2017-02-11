@@ -15,13 +15,13 @@ function zk_local_cluster() {
   export ZK_initLimit=${ZK_initLimit:-5}
   export ZK_syncLimit=${ZK_syncLimit:-2}
 
-  export ZK_server_port=${ZK_server_port:-2888}
-  export ZK_election_port=${ZK_election_port:-3888}
+  ZOO_SERVER_PORT=${ZOO_SERVER_PORT:-2888}
+  ZOO_ELECTION_PORT=${ZOO_ELECTION_PORT:-3888}
 
   SERVER_zookeeper_connect=''
 
   for (( i=1; i<=$KAFKA_REPLICAS; i++ )); do
-    export ZK_server_$i="$NAME-$((i-1)).$DOMAIN:$ZK_server_port:$ZK_election_port"
+    export ZK_server_$i="$NAME-$((i-1)).$DOMAIN:$ZOO_SERVER_PORT:$ZOO_ELECTION_PORT"
     SERVER_zookeeper_connect=${SERVER_zookeeper_connect}"$NAME-$((i-1)).$DOMAIN:"${ZK_clientPort}","
   done
 
