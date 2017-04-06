@@ -12,7 +12,8 @@ ENV KAFKA_HOME=${KAFKA_HOME} \
     KAFKA_VERSION=${KAFKA_VERSION} \
     SCALA_VERSION=${SCALA_VERSION} \
     KAFKA_ZK_LOCAL=true \
-    KAFKA_REPLICAS=1
+    KAFKA_REPLICAS=1 \
+    SERVER_port=9092
 
 # Required packages
 RUN set -x \
@@ -43,5 +44,7 @@ RUN set -x \
 
 USER $KAFKA_USER
 WORKDIR $KAFKA_HOME
+
+EXPOSE $SERVER_port
 
 ENTRYPOINT ["kafka_env.sh"]
