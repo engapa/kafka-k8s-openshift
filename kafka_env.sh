@@ -56,5 +56,3 @@ fi
 if [ -z $SERVER_broker_id ]; then
   export SERVER_broker_id=-1
 fi
-
-exec "$@"

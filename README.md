@@ -4,7 +4,7 @@
 [![Docker Layering](https://images.microbadger.com/badges/image/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
 # Kafka Docker Image
 
-The aim of this project is create/use kafka docker images.
+In this project we have the nested resources to build a kafka docker image and kubernetes examples.
 
 # Build an image
 
@@ -16,23 +16,25 @@ $docker build --build-arg SCALA_VERSION=$SCALA_VERSION --build-arg KAFKA_VERSION
 -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 ```
 
-The **kafka_download.sh** script is used to download the suitable release.
 The built docker image will contain a kafka distribution (${SCALA_VERSION}-${KAFKA_VERSION}) under the directory $KAFKA_HOME.
 
-Besides, we've added two scripts more :
+These are the provided scripts:
 
-* kafka_setup.sh  : Configure kafka and zookeeper dynamically , based on [utils-docker project](https://github.com/engapa/utils-docker)
-* kafka_server.sh : A wrapper to manage kafka and zookeeper processes
+* kafka_download.sh : This script is used to download the suitable release.
+* kafka_env.sh : It purpose is load the default environments variables.
+* kafka_setup.sh : Configure kafka and zookeeper dynamically , based on [utils-docker project](https://github.com/engapa/utils-docker)
+* kafka_server.sh : A central script to manage kafka and optional zookeeper processes.
+* kafka_server_status.sh : Checks kafka server status.
 
 # Run a container
 
-This image hasn't any `CMD` entry, users are the responsible for launching any command when they are going to run the container.
+Default `CMD` runs a kafka server with a zookeeper subprocess.
 
-For example, let's create a container to run kafka and zookeeper all-in-one :
+The below example shows you how to run a docker all-in-one container with kafka and zookeeper :
 
 ```bash
-docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} \
- /bin/bash -c "kafka_setup.sh && kafka_server.sh start"
+$ docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
+
 Writing environment variables to file :
 
 PREFIX           : SERVER_
@@ -74,7 +76,7 @@ LOWER            : false
 [2017-01-31 20:17:29,647] INFO [Kafka Server 1001], started (kafka.server.KafkaServer)
 ```
 
->NOTE: We've pass a SETUP_DEBUG environment variable to view the setup process of config files.
+>NOTE: We've passed a SETUP_DEBUG environment variable ( SETUP_DEBUG=true )to view the setup process details.
 
 ## Setting up
 
@@ -101,19 +103,19 @@ TOOLS_LOG4J_ | tools-log4j.properties | TOOLS_LOG4J_log4j_appender_stderr_Target
 So we can configure our kafka server in docker run time :
 
 ```bash
-$docker run -it -d -e "LOG4J_log4j_rootLogger=DEBUG, stdout" -e "SERVER_log_retention_hours=24"\
-engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c "kafka_setup.sh && kafka_server.sh start"
+$ docker run -it -d -e "LOG4J_log4j_rootLogger=DEBUG, stdout" -e "SERVER_log_retention_hours=24"\
+engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 ```
 
 Also you may use `--env-file` option to load these variables from a file.
 
 And , of course, you could provide your own property files directly by option `-v` and don't use `kafka_setup` and `kafka_server` scripts.
 
-The override option of kafka server is preserved and can used by you :
+The override option of kafka server is preserved and anybody can use it on this way :
 
 ```bash
-docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} \
- /bin/bash -c "kafka_setup.sh && kafka_server.sh start --override advertised.host.name=blablabla"
+$ docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} \
+ /bin/bash -c "kafka_server.sh start --override advertised.host.name=blablabla"
  [2017-02-04 19:06:10,504] INFO KafkaConfig values:
 	advertised.host.name = blablabla
 ...
@@ -135,8 +137,8 @@ If you want to deploy a kafka server w/o local zookeeper then you should provide
 For instance :
 
 ```bash
-$docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_zookeeper_connect=zookeeperserver1:2181,zookeeperserver2:2181,zookeeperserver3:2181" \
-engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c "kafka_setup.sh && kafka_server.sh start"
+$ docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_zookeeper_connect=zookeeperserver1:2181,zookeeperserver2:2181,zookeeperserver3:2181" \
+engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 ```
 
 # k8s
