@@ -92,14 +92,9 @@ spec:
           value: "false"
         - name: SERVER_zookeeper_connect
           value: "zk-0.zk-svc:2181,zk-1.zk-svc:2181,zk-2.zk-svc:2181"
-        command:
-        - /bin/bash
-        - -c
-        - source kafka_env.sh && kafka_setup.sh && kafka_server.sh start
         livenessProbe:
           exec:
             command:
-            - kafka_server.sh
-            - status
+            - kafka_server_status.sh
           initialDelaySeconds: 15
           timeoutSeconds: 5

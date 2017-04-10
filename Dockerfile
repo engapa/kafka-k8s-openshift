@@ -31,7 +31,7 @@ RUN set -x \
     && apk del gnupg
 
 # Add custom scripts and configure user
-ADD kafka_setup.sh kafka_server.sh kafka_env.sh $KAFKA_HOME/bin/
+ADD kafka_env.sh kafka_setup.sh kafka_server.sh kafka_server_status.sh $KAFKA_HOME/bin/
 
 RUN set -x \
     && chmod a+x $KAFKA_HOME/bin/kafka_*.sh \
@@ -47,4 +47,4 @@ WORKDIR $KAFKA_HOME
 
 EXPOSE $SERVER_port
 
-ENTRYPOINT ["kafka_env.sh"]
+CMD kafka_server.sh start

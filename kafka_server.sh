@@ -2,27 +2,29 @@
 
 ### Default properties
 
-KAFKA_HOME=${KAFKA_HOME:-/opt/kafka}
-KAFKA_ZK_LOCAL=${KAFKA_ZK_LOCAL:-true}
+. kafka_env.sh
 
 KAFKA_PID_FILE=$KAFKA_HOME/kafka.pid
 ZOO_PID_FILE=$KAFKA_HOME/zookeeper.pid
 
 function start() {
 
+  kafka_setup.sh
+
   if $KAFKA_ZK_LOCAL;then
     ZOO_LOG_DIR=${ZOO_LOG_DIR:-${KAFKA_HOME}/zookeeper}
     mkdir -p $ZOO_LOG_DIR
-    bin/zookeeper-server-start.sh config/zookeeper.properties > $ZOO_LOG_DIR/zookeeper.out 2>&1 < /dev/null &
+    $KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_CONF_DIR/zookeeper.properties > $ZOO_LOG_DIR/zookeeper.out 2>&1 < /dev/null &
+    ZOO_PID=$!
     if [ $? -eq 0 ]; then
-      echo -n $! > $ZOO_PID_FILE
+      echo -n $ZOO_PID > $ZOO_PID_FILE
     else
       echo "Failed to start zookeeper server"
       return 1
     fi
   fi
 
-  bin/kafka-server-start.sh config/server.properties "$@" &
+  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_CONF_DIR/server.properties "$@" &
   KAFKA_PID=$!
   RET_CODE=$?
   if [[ $RET_CODE -eq 0 ]]; then
@@ -37,7 +39,7 @@ function start() {
 
 function stop() {
 
-  bin/kafka-server-stop.sh
+  $KAFKA_HOME/bin/kafka-server-stop.sh
   if [[ -f $KAFKA_PID_FILE ]]; then
     kill -s TERM $(cat "$KAFKA_PID_FILE")
     rm $KAFKA_PID_FILE
@@ -46,7 +48,7 @@ function stop() {
   sleep 5
 
   if $KAFKA_ZK_LOCAL;then
-    bin/zookeeper-server-stop.sh
+    $KAFKA_HOME/bin/zookeeper-server-stop.sh
     if [[ -f $ZOO_PID_FILE ]]; then
       kill -s TERM $(cat "$ZOO_PID_FILE")
       rm $ZOO_PID_FILE
@@ -76,26 +78,7 @@ function stop() {
 
 }
 
-function status() {
-
-  ZK_clientPort=${ZK_clientPort:-2181}
-  ZOOKEEPER_PARAM="localhost:${ZK_clientPort}"
-  if ! $KAFKA_ZK_LOCAL;then
-    ZOOKEEPER_PARAM=${SERVER_zookeeper_connect:-$ZOOKEEPER_PARAM}
-  fi
-
-  timeout -t 10 bin/kafka-topics.sh --zookeeper $ZOOKEEPER_PARAM --list > /dev/null 2>&1
-  return $?
-
-}
-
-
-term_handler() {
-  stop
-}
-
-trap "term_handler" SIGHUP SIGINT SIGTERM
-
+trap "stop" SIGHUP SIGINT SIGTERM
 
 # Main options
 case "$1" in
@@ -115,17 +98,7 @@ case "$1" in
         start "$@"
         exit $?
         ;;
-  status)
-        status
-        STATUS_RET_VAL=$?
-        if [[ $STATUS_RET_VAL != 0 ]]; then
-          echo "Kafka server is not running -  KO, :-("
-        else
-          echo "Kafka server is running - OK, :-)"
-        fi
-        exit $STATUS_RET_VAL
-        ;;
   *)
-        echo "Usage: $0 {start|stop|restart|status}"
+        echo "Usage: $0 {start|stop|restart}"
         exit 1
 esac
