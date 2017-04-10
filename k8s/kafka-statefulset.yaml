@@ -50,10 +50,6 @@ spec:
           value: "3"
         - name: SERVER_zookeeper_connection_timeout_ms
           value: "300000"
-        command:
-        - /bin/bash
-        - -c
-        - kafka_server.sh start
         livenessProbe:
           exec:
             command:

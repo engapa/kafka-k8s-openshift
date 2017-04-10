@@ -39,10 +39,6 @@ spec:
           value: "false"
         - name: SERVER_zookeeper_connect
           value: "zk-0.zk-svc:2181,zk-1.zk-svc:2181,zk-2.zk-svc:2181"
-        command:
-        - /bin/bash
-        - -c
-        - kafka_server.sh start
         livenessProbe:
           exec:
             command:
