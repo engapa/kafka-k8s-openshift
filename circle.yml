@@ -13,10 +13,9 @@ dependencies:
 test:
   override:
     - >
-      docker run -it -d --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} /bin/bash -c \
-      "kafka_setup.sh && kafka_server.sh start"
+      docker run -it -d --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
     - if [ $(docker inspect -f {{.State.Running}} kafka) == 'true' ]; then exit 0; else exit 1; fi
-    # - sudo lxc-attach -n "$(docker inspect --format "{{.Id}}" kafka)" -- /bin/bash -c "/opt/kafka/bin/kafka_server.sh status" && exit $?
+    # - sudo lxc-attach -n "$(docker inspect --format "{{.Id}}" kafka)" -- /bin/bash -c "kafka_server_status.sh" && exit $?
     - docker stop kafka
 
 deployment:

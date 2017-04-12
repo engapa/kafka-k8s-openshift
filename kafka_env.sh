@@ -2,12 +2,6 @@
 
 ### Default properties
 
-KAFKA_HOME=${KAFKA_HOME:-/opt/kafka}
-KAFKA_CONF_DIR=$KAFKA_HOME/config
-KAFKA_ZK_LOCAL=${KAFKA_ZK_LOCAL:-true}
-
-export SERVER_log_dirs=${SERVER_log_dirs:-$KAFKA_HOME/logs}
-
 function zk_local_cluster() {
 
   # Required envs for replicated mode
@@ -29,15 +23,15 @@ function zk_local_cluster() {
 
 }
 
-HOST=`hostname -s`
-DOMAIN=`hostname -d`
-
 if $KAFKA_ZK_LOCAL;then
   export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
   export ZK_dataLogDir=${ZK_dataLogDir:-$KAFKA_HOME/zookeeper/data-log}
   export ZK_clientPort=${ZK_clientPort:-2181}
   export SERVER_zookeeper_connect=${SERVER_zookeeper_connect:-"localhost:${ZK_clientPort}"}
 fi
+
+HOST=`hostname -s`
+DOMAIN=`hostname -d`
 
 if [ $KAFKA_REPLICAS -gt 1 ];then
   if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
@@ -56,3 +50,5 @@ fi
 if [ -z $SERVER_broker_id ]; then
   export SERVER_broker_id=-1
 fi
+
+export SERVER_log_dirs=${SERVER_log_dirs:-$KAFKA_HOME/logs}
