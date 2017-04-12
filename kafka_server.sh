@@ -9,11 +9,16 @@ ZOO_PID_FILE=$KAFKA_HOME/zookeeper.pid
 
 function start() {
 
-  kafka_setup.sh
+  . kafka_setup.sh
 
   if $KAFKA_ZK_LOCAL;then
+
+    mkdir -p ${ZK_dataDir} ${ZK_dataLogDir}
+    echo "${SERVER_broker_id:-0}" > $ZK_dataDir/myid
+
     ZOO_LOG_DIR=${ZOO_LOG_DIR:-${KAFKA_HOME}/zookeeper}
     mkdir -p $ZOO_LOG_DIR
+
     $KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_CONF_DIR/zookeeper.properties > $ZOO_LOG_DIR/zookeeper.out 2>&1 < /dev/null &
     ZOO_PID=$!
     if [ $? -eq 0 ]; then
@@ -22,6 +27,22 @@ function start() {
       echo "Failed to start zookeeper server"
       return 1
     fi
+    # Are zookeeper ok
+    COUNT_DOWN_ZOO=9
+
+    until [[ $COUNT_DOWN_ZOO -lt 0 ]]; do
+      if [[ 'imok' == $(echo ruok | nc 127.0.0.1 $ZK_clientPort) ]]; then
+        echo "Zookeeper server is ready ! "
+        break;
+      fi
+      if [[ $COUNT_DOWN_ZOO -eq 0 ]]; then
+        echo "No Zookeeper server is ready"
+        return 1
+      fi
+      echo "Waiting for local Zookeper server [$  ]..."
+      COUNT_DOWN_ZOO=`expr $COUNT_DOWN_ZOO - 1`
+      sleep 3
+    done
   fi
 
   $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_CONF_DIR/server.properties "$@" &
@@ -56,21 +77,21 @@ function stop() {
   fi
 
   sleep 5
-  COUNT_DOWN=0
+  COUNT_DOWN=9
 
-  until [[ ! $COUNT_DOWN -lt 10 ]]; do
+  until [[ $COUNT_DOWN -lt 0 ]]; do
     KAFKA_JAVA_PIDS=$(ps ax | grep -i 'kafka' | grep java | grep -v grep | awk '{print $1}')
     if [[ -z $KAFKA_JAVA_PIDS ]]; then
       echo "It seems that there is not a kafka server running yet - OK, :-)"
       return 0
-    elif [[ $COUNT_DOWN -lt 9 ]]; then
+    elif [[ $COUNT_DOWN -gt 0 ]]; then
       echo "(${COUNT_DOWN}) Trying stop processes: ${KAFKA_JAVA_PIDS}"
       kill -s TERM $KAFKA_JAVA_PIDS
     else
       echo "(${COUNT_DOWN}) Killing processes: ${KAFKA_JAVA_PIDS}"
       kill -s KILL $KAFKA_JAVA_PIDS
     fi
-    COUNT_DOWN=`expr $COUNT_DOWN + 1`
+    COUNT_DOWN=`expr $COUNT_DOWN - 1`
     sleep 3
   done
 
