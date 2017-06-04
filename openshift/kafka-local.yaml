@@ -136,7 +136,7 @@ objects:
             value: ${SERVER_ZOOKEEPER_CONNECT}
           - name: SERVER_zookeeper_connection_timeout_ms
             value: "30000"
-          redinessProbe:
+          readinessProbe:
             exec:
               command:
               - kafka_server_status.sh
