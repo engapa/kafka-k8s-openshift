@@ -141,9 +141,13 @@ $ docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_zookeeper_connect=zooke
 engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 ```
 
-# k8s
+# Kubernetes
 
 In [k8s directory](k8s) there are some examples and utilities for Kubernetes
+
+# Openshift
+
+In [openshift directory](openshift) there are some examples of Openshift templates.
 
 # Author
 
