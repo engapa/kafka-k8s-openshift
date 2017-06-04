@@ -185,14 +185,14 @@ objects:
             exec:
               command:
               - kafka_server_status.sh
-            initialDelaySeconds: 20
-            timeoutSeconds: 5
+            initialDelaySeconds: 30
+            timeoutSeconds: 15
           livenessProbe:
             exec:
               command:
               - kafka_server_status.sh
-            initialDelaySeconds: 20
-            timeoutSeconds: 5
+            initialDelaySeconds: 30
+            timeoutSeconds: 15
           volumeMounts:
           - name: kafka-data
             mountPath: /opt/kafka/data
