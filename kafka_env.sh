@@ -37,12 +37,12 @@ if [ $KAFKA_REPLICAS -gt 1 ];then
   if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
     NAME=${BASH_REMATCH[1]}
     ORD=${BASH_REMATCH[2]}
-    export SERVER_broker_id=$((ORD+1))
+    export SERVER_broker_id=${ORD}
     if $KAFKA_ZK_LOCAL;then
       zk_local_cluster
     fi
   elif $KAFKA_ZK_LOCAL; then
-    echo "Unable to create local Zookeeper. Name of host doesn't match with pattern: (.*)-([0-9]+). Consider using PetSets or StatefulSets."
+    echo "Unable to create local Zookeeper. Name of host doesn't match with pattern: (.*)-([0-9]+). Consider using StatefulSets."
     exit 1
   fi
 fi
