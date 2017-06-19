@@ -39,7 +39,7 @@ function start() {
         echo "No Zookeeper server is ready"
         return 1
       fi
-      echo "Waiting for local Zookeper server [$  ]..."
+      echo "Waiting for local Zookeper server ..."
       COUNT_DOWN_ZOO=`expr $COUNT_DOWN_ZOO - 1`
       sleep 3
     done
