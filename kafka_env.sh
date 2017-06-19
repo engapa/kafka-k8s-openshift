@@ -37,7 +37,7 @@ if [ $KAFKA_REPLICAS -gt 1 ];then
   if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
     NAME=${BASH_REMATCH[1]}
     ORD=${BASH_REMATCH[2]}
-    export SERVER_broker_id=$((ORD))
+    export SERVER_broker_id=$((ORD+1))
     if $KAFKA_ZK_LOCAL;then
       zk_local_cluster
     fi
