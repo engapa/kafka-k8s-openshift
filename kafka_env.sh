@@ -47,8 +47,4 @@ if [ $KAFKA_REPLICAS -gt 1 ];then
   fi
 fi
 
-if [ -z $SERVER_broker_id ]; then
-  export SERVER_broker_id=-1
-fi
-
 export SERVER_log_dirs=${SERVER_log_dirs:-$KAFKA_HOME/logs}
