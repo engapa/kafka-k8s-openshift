@@ -18,7 +18,7 @@ parameters:
 - name: KAFKA_VERSION
   description: Kafka Version
   required: true
-  value: "0.10.2.1"
+  value: "0.11.0.0"
 - name: SCALA_VERSION
   description: Scala Version
   required: true
@@ -177,9 +177,9 @@ objects:
             value: ${SERVER_LOG_RETENTION_HOURS}
           - name:  SERVER_zookeeper_connect
             value: ${SERVER_ZOOKEEPER_CONNECT}
-          - name: SERVER_log_dirs
+          - name:  SERVER_log_dirs
             value: "/opt/kafka/data/logs"
-          - name: SERVER_zookeeper_connection_timeout_ms
+          - name:  SERVER_zookeeper_connection_timeout_ms
             value: "30000"
           readinessProbe:
             exec:

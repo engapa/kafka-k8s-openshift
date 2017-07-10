@@ -28,7 +28,7 @@ spec:
       containers:
       - name: kafka
         imagePullPolicy: Always
-        image: engapa/kafka:2.12-0.10.2.1
+        image: engapa/kafka:2.12-0.11.0.0
         ports:
         - containerPort: 9092
           name: server
