@@ -18,7 +18,7 @@ parameters:
   value: kafka
 - name: SOURCE_IMAGE
   description: Container image source (by default from "engapa" dockerhub account)
-  value: engapa/kakfa
+  value: engapa/kafka
 - name: KAFKA_VERSION
   description: Kafka Version
   required: true
@@ -68,6 +68,14 @@ parameters:
     Zookeeper conection list as URL, nodes separated by ','.
     This value takes effect when KAFKA_ZK_LOCAL is false
   value: "localhost:2181"
+- name: SERVER_ZOOKEEPER_CONNECT_TIMEOUT
+  description: >
+    The max time that the client waits to establish a connection to zookeeper (ms).
+  value: "6000"
+- name: LP_INITIAL_DELAY
+  description: >
+    LivenessProbe initial delay in seconds.
+  value: "30"
 - name: VOLUME_KAFKA_CAPACITY
   description: Kafka logs capacity
   required: true
@@ -75,7 +83,7 @@ parameters:
 - name: VOLUME_ZK_CAPACITY
   description: Zookeeper data capacity
   required: true
-  value: "10Gi"
+  value: "1Gi"
 - name: RESOURCE_MEMORY_REQ
   description: The memory resource request.
   value: "1Gi"
@@ -93,7 +101,7 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: ${NAME}-svc
+    name: ${NAME}
     labels:
       app: ${NAME}
     annotations:
@@ -116,8 +124,10 @@ objects:
   kind: StatefulSet
   metadata:
     name: ${NAME}
+    labels:
+      app: ${NAME}
   spec:
-    serviceName: ${NAME}-svc
+    serviceName: ${NAME}
     replicas: ${SCALE}
     template:
       metadata:
@@ -184,7 +194,7 @@ objects:
           - name:  SERVER_log_dirs
             value: "/opt/kafka/data/logs"
           - name:  SERVER_zookeeper_connection_timeout_ms
-            value: "30000"
+            value: ${SERVER_ZOOKEEPER_CONNECT_TIMEOUT}
           readinessProbe:
             exec:
               command:
@@ -195,16 +205,21 @@ objects:
             exec:
               command:
               - kafka_server_status.sh
-            initialDelaySeconds: 30
-            timeoutSeconds: 15
+            initialDelaySeconds: ${LP_INITIAL_DELAY}
+            timeoutSeconds: 5
           volumeMounts:
           - name: kafka-data
             mountPath: /opt/kafka/data
           - name: zookeeper-data
             mountPath: /opt/kafka/zookeeper
+#          securityContext:
+#            runAsUser: 10000
+#            fsGroup: 10000
     volumeClaimTemplates:
     - metadata:
         name: kafka-data
+        labels:
+          app: ${NAME}
         annotations:
           volume.alpha.kubernetes.io/storage-class: anything
       spec:
@@ -214,6 +229,8 @@ objects:
             storage: ${VOLUME_KAFKA_CAPACITY}
     - metadata:
         name: zookeeper-data
+        labels:
+          app: ${NAME}
         annotations:
           volume.alpha.kubernetes.io/storage-class: anything
       spec:
