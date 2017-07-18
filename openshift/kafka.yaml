@@ -142,7 +142,7 @@ objects:
       spec:
         containers:
         - name: ${NAME}
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           image: ${SOURCE_IMAGE}:${SCALA_VERSION}-${KAFKA_VERSION}
           resources:
             requests:
