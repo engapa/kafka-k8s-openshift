@@ -1,20 +1,24 @@
 kind: Template
 apiVersion: v1
 metadata:
-  name: kafka-statefulset
+  name: kafka
   annotations:
-    openshift.io/display-name: Kafka Statefulset
+    openshift.io/display-name: Kafka
     description: A distibuted streaming platform
     iconClass: icon-database
     tags: messaging,kafka
 labels:
-  template: kafka-statefulset
+  template: kafka
+  component: kafka
 
 parameters:
 - name: NAME
   description: Name
   required: true
   value: kafka
+- name: SOURCE_IMAGE
+  description: Container image source (by default from "engapa" dockerhub account)
+  value: engapa/kakfa
 - name: KAFKA_VERSION
   description: Kafka Version
   required: true
@@ -139,7 +143,7 @@ objects:
         containers:
         - name: ${NAME}
           imagePullPolicy: Always
-          image: engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
+          image: ${SOURCE_IMAGE}:${SCALA_VERSION}-${KAFKA_VERSION}
           resources:
             requests:
               memory: ${RESOURCE_MEMORY_REQ}

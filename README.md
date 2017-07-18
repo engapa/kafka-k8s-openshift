@@ -76,11 +76,11 @@ LOWER            : false
 [2017-01-31 20:17:29,647] INFO [Kafka Server 1001], started (kafka.server.KafkaServer)
 ```
 
->NOTE: We've passed a SETUP_DEBUG environment variable ( SETUP_DEBUG=true )to view the setup process details.
+>NOTE: We've passed a SETUP_DEBUG environment variable (SETUP_DEBUG=true) to view the setup process details.
 
 ## Setting up
 
-Users can pass parameters to config files just adding environment variables with specific name patterns.
+Users can provide parameters to config files just adding environment variables with specific name patterns.
 
 This table collects the patterns of variable names which will are written in each file:
 
