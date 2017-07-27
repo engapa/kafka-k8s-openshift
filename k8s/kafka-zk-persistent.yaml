@@ -1,0 +1,152 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    kafka-name: kafka
+    component: kafka
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  ports:
+  - port: 9092
+    name: server
+  - port: 2181
+    name: zkclient
+  - port: 2888
+    name: zkserver
+  - port: 3888
+    name: zkleader
+  clusterIP: None
+  selector:
+    kafka-name: kafka
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: kafka
+  labels:
+    kafka-name: kafka
+    component: kafka
+spec:
+  podManagementPolicy: "Parallel"
+  serviceName: kafka
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        kafka-name: kafka
+        component: kafka
+      annotations:
+        # Use this annotation if you want allocate each pod on different node
+        # Note the number of nodes must be upper than REPLICAS parameter.
+        scheduler.alpha.kubernetes.io/affinity: >
+          {
+            "podAntiAffinity": {
+              "requiredDuringSchedulingIgnoredDuringExecution": [{
+                "labelSelector": {
+                  "matchExpressions": [{
+                    "key": "kafka-name",
+                    "operator": "In",
+                    "values": ["${NAME}"]
+                  }]
+                },
+                "topologyKey": "kubernetes.io/hostname"
+              }]
+            }
+          }
+    spec:
+      containers:
+      - name: kafka
+        imagePullPolicy: IfNotPresent
+        image: engapa/kafka:2.12-0.11.0.0
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 1
+          limits:
+            memory: 2Gi
+            cpu: 2
+        ports:
+        - containerPort: 9092
+          name: server
+        - containerPort: 2181
+          name: zkclient
+        - containerPort: 2888
+          name: zkserver
+        - containerPort: 3888
+          name: zkleader
+        env:
+        - name:  KAFKA_VERSION
+          value: "0.11.0.0"
+        - name:  SCALA_VERSION
+          value: "2.12"
+        - name : KAFKA_REPLICAS
+          value: "1"
+        - name:  KAFKA_ZK_LOCAL
+          value: "true"
+        - name : ZOO_HEAP_OPTS
+          value: "-Xmx512M -Xms512M"
+        - name:  KAFKA_HEAP_OPTS
+          value: "-Xmx1448M -Xms1448M"
+        - name:  SERVER_num_partitions
+          value: "1"
+        - name:  SERVER_delete_topic_enable
+          value: "true"
+        - name:  SERVER_log_retention_hours
+          value: "2147483647"
+        - name:  SERVER_zookeeper_connect
+          value: "localhost:2181"
+        - name:  SERVER_log_dirs
+          value: "/opt/kafka/data/logs"
+        - name:  SERVER_zookeeper_connection_timeout_ms
+          value: "30000"
+        # TODO: Resolve HostNotFound exception of zookeeper servers while kafka is starting up
+        #readinessProbe:
+        #  exec:
+        #    command:
+        #    - kafka_server_status.sh
+        #  initialDelaySeconds: 15
+        #  timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - kafka_server_status.sh
+          initialDelaySeconds: 20
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: kafka-data
+          mountPath: /opt/kafka/data
+        - name: zk-data
+          mountPath: /opt/kafka/zookeeper/data
+        - name: zk-datalog
+          mountPath: /opt/kafka/zookeeper/data-log
+  volumeClaimTemplates:
+  - metadata:
+      name: kafka-data
+      annotations:
+        volume.alpha.kubernetes.io/storage-class: anything
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi
+  - metadata:
+      name: zk-data
+      annotations:
+        volume.alpha.kubernetes.io/storage-class: anything
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+  - metadata:
+      name: zk-datalog
+      annotations:
+        volume.alpha.kubernetes.io/storage-class: anything
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

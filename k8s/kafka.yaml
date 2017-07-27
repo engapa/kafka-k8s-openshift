@@ -1,9 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka-svc
+  name: kafka
   labels:
-    app: kafka
+    kafka-name: kafka
+    component: kafka
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
@@ -18,19 +19,23 @@ spec:
     name: zkleader
   clusterIP: None
   selector:
-    app: kafka
+    kafka-name: kafka
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
   name: kafka
+  labels:
+    kafka-name: kafka
+    component: kafka
 spec:
-  serviceName: kafka-svc
+  serviceName: kafka
   replicas: 3
   template:
     metadata:
       labels:
-        app: kafka
+        kafka-name: kafka
+        component: kafka
     spec:
       containers:
       - name: kafka
@@ -46,9 +51,13 @@ spec:
         - containerPort: 3888
           name: zkleader
         env:
-        - name: KAFKA_REPLICAS
+        - name:  KAFKA_REPLICAS
           value: "3"
-        - name: SERVER_zookeeper_connection_timeout_ms
+        - name:  KAFKA_ZK_LOCAL
+          value: "true"
+        - name:  SERVER_zookeeper_connection
+          value: "localhost:2181"
+        - name:  SERVER_zookeeper_connection_timeout_ms
           value: "300000"
         livenessProbe:
           exec:
