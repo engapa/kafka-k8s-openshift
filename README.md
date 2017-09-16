@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/engapa/kafka-docker/tree/master.svg?style=svg)](https://circleci.com/gh/engapa/kafka-docker/tree/master)
+[![Build Status](https://travis-ci.org/engapa/kafka-k8s-openshift.svg?branch=master)](https://travis-ci.org/engapa/kafka-k8s-openshift)
 [![Docker Pulls](https://img.shields.io/docker/pulls/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
 [![Docker Stars](https://img.shields.io/docker/stars/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
 [![Docker Layering](https://images.microbadger.com/badges/image/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
