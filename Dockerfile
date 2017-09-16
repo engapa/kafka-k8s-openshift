@@ -29,7 +29,8 @@ RUN set -x \
 
 RUN /tmp/kafka_download.sh
 
-RUN rm -rf /tmp/kafka_download.sh
+RUN set -x \
+    && rm -rf /tmp/kafka_download.sh \
     && apk del gnupg
 
 # Add custom scripts and configure user
