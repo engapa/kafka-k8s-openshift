@@ -4,7 +4,7 @@
 [![Docker Layering](https://images.microbadger.com/badges/image/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
 # Kafka Docker Image
 
-This project is meant to create an optimised docker image to run kafka containers as 'statefulset' into kubernetes/openshift we have the nested resources to build a kafka docker image and kubernetes examples.
+This project is meant to create an optimised docker image to run kafka containers as 'statefulset' into kubernetes/openshift.
 
 # Build an image
 
