@@ -15,8 +15,8 @@ test:
     - >
       docker run -it -d --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
     - if [ $(docker inspect -f {{.State.Running}} kafka) == 'true' ]; then exit 0; else exit 1; fi
-    # - sudo lxc-attach -n "$(docker inspect --format "{{.Id}}" kafka)" -- /bin/bash -c "kafka_server_status.sh" && exit $?
-    - docker rm -f kafka
+    - docker stop kafka
+    - docker rm kafka
 
 deployment:
   hub:
