@@ -25,11 +25,8 @@ ADD kafka_download.sh /tmp/
 
 RUN set -x \
     && mkdir -p $KAFKA_HOME \
-    && chmod a+x /tmp/kafka_download.sh \
-    && /tmp/kafka_download.sh
-#    && rm -rf /tmp/kafka_download.sh \
-#    && apk del gnupg
-
+    && chmod a+x /tmp/kafka_download.sh
+RUN /tmp/kafka_download.sh
 # Add custom scripts and configure user
 ADD kafka_env.sh kafka_setup.sh kafka_server.sh kafka_server_status.sh $KAFKA_HOME/bin/
 
