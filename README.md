@@ -4,21 +4,23 @@
 [![Docker Layering](https://images.microbadger.com/badges/image/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
 # Kafka Docker Image
 
-In this project we have the nested resources to build a kafka docker image and kubernetes examples.
+This project is meant to create an optimised docker image to run kafka containers as 'statefulset' into kubernetes/openshift we have the nested resources to build a kafka docker image and kubernetes examples.
 
 # Build an image
 
 ```bash
-export KAFKA_HOME="/opt/kafka"
-export SCALA_VERSION="2.12"
-export KAFKA_VERSION="0.11.0.0"
-$docker build --build-arg SCALA_VERSION=$SCALA_VERSION --build-arg KAFKA_VERSION=$KAFKA_VERSION --build-arg KAFKA_HOME=$KAFKA_HOME \
+$ export KAFKA_HOME="/opt/kafka"
+$ export SCALA_VERSION="2.12"
+$ export KAFKA_VERSION="0.11.0.1"
+$ docker build --build-arg SCALA_VERSION=$SCALA_VERSION --build-arg KAFKA_VERSION=$KAFKA_VERSION --build-arg KAFKA_HOME=$KAFKA_HOME \
 -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 ```
 
+> NOTE: build-args are optional arguments if you want different values from default ones in the Dockerfile
+
 The built docker image will contain a kafka distribution (${SCALA_VERSION}-${KAFKA_VERSION}) under the directory $KAFKA_HOME.
 
-These are the provided scripts:
+The provided scripts are:
 
 * kafka_download.sh : This script is used to download the suitable release.
 * kafka_env.sh : It purpose is load the default environments variables.
@@ -71,7 +73,7 @@ LOWER            : false
 [2017-01-31 20:17:28,150] INFO Socket connection established to localhost/127.0.0.1:2181, initiating session (org.apache.zookeeper.ClientCnxn)
 [2017-01-31 20:17:28,308] INFO Session establishment complete on server localhost/127.0.0.1:2181, sessionid = 0x159f62cc8c00000, negotiated timeout = 6000 (org.apache.zookeeper.ClientCnxn)
 ...
-[2017-01-31 20:17:29,646] INFO Kafka version : 0.11.0.0 (org.apache.kafka.common.utils.AppInfoParser)
+[2017-01-31 20:17:29,646] INFO Kafka version : 0.11.0.1 (org.apache.kafka.common.utils.AppInfoParser)
 [2017-01-31 20:17:29,646] INFO Kafka commitId : f10ef2720b03b247 (org.apache.kafka.common.utils.AppInfoParser)
 [2017-01-31 20:17:29,647] INFO [Kafka Server 1001], started (kafka.server.KafkaServer)
 ```
@@ -109,7 +111,7 @@ engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 
 Also you may use `--env-file` option to load these variables from a file.
 
-And , of course, you could provide your own property files directly by option `-v` and don't use `kafka_setup` and `kafka_server` scripts.
+And, of course, you could provide your own property files directly by option `-v` and don't use `kafka_setup` and `kafka_server` scripts.
 
 The override option of kafka server is preserved and anybody can use it on this way :
 

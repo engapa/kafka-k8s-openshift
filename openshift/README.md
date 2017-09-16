@@ -16,7 +16,7 @@ Anyway, if you prefer to build the image in your private Openshift registry just
 
 ```sh
 $ oc create -f buildconfig.yaml
-$ oc new-app kafka-builder -p IMAGE_STREAM_VERSION="2.12-0.11.0.0" -p GITHUB_REF="v2.12-0.11.0.0"
+$ oc new-app kafka-builder -p IMAGE_STREAM_VERSION="2.12-0.11.0.1" -p GITHUB_REF="v2.12-0.11.0.1"
 ```
 
 Explore the command `oc new-build` to create a builder via shell command client.
@@ -26,7 +26,7 @@ Explore the command `oc new-build` to create a builder via shell command client.
 ```sh
 $ oc get is -l component=zk [-n project]
 NAME    DOCKER REPO                       TAGS           UPDATED
-kafka   172.30.1.1:5000/myproject/kafka   2.12-0.11.0.0  1 days ago
+kafka   172.30.1.1:5000/myproject/kafka   2.12-0.11.0.1  1 days ago
 ```
 
 3 - If you want to use this local/private image for your pod containers then use the "DOCKER REPO" value as `SOURCE_IMAGE` parameter value, and use one of the "TAGS" values as `KAFKA_VERSION` parameter value (e.g: 172.30.1.1:5000/myproject/kafka:latest).
