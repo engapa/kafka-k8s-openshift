@@ -19,3 +19,8 @@ script:
 after_script:
 - docker stop kafka
 - docker rm kafka
+
+after_success:
+  - >
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" &&
+    docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION};
