@@ -5,7 +5,7 @@ env:
   KAFKA_VERSION: "0.11.0.1"
 
 services:
-  - docker
+- docker
 
 before_install:
 - docker build --no-cache -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
@@ -16,11 +16,13 @@ install:
 script:
 - docker exec -it kafka kafka_server_status.sh
 
+after_success:
+- docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+- docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
+- if [ "$TRAVIS_BRANCH" == "master" ]; then
+  docker push engapa/kafka:latest;
+  fi
+
 after_script:
 - docker stop kafka
 - docker rm kafka
-
-after_success:
-  - >
-    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" &&
-    docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION};
