@@ -16,16 +16,12 @@ parameters:
   required: true
   value: kafka
 - name: KAFKA_VERSION
-  description: Kafka Version.
+  description: Kafka Version (Scala and kafka version).
   required: true
-  value: "0.11.0.1"
-- name: SCALA_VERSION
-  description: Scala Version.
-  required: true
-  value: "2.12"
+  value: "2.12-0.11.0.1"
 - name: SOURCE_IMAGE
   description: Container image source.
-  value: engapa/kafka
+  value: kafka
   required: true
 - name: REPLICAS
   description: Number of replicas.
@@ -144,7 +140,7 @@ objects:
         containers:
         - name: ${NAME}
           imagePullPolicy: IfNotPresent
-          image: ${SOURCE_IMAGE}:${SCALA_VERSION}-${KAFKA_VERSION}
+          image: ${SOURCE_IMAGE}:${KAFKA_VERSION}
           resources:
             requests:
               memory: ${RESOURCE_MEMORY_REQ}
@@ -162,10 +158,6 @@ objects:
           - containerPort: 3888
             name: zkleader
           env:
-          - name:  KAFKA_VERSION
-            value: ${KAFKA_VERSION}
-          - name:  SCALA_VERSION
-            value: ${SCALA_VERSION}
           - name : KAFKA_REPLICAS
             value: ${REPLICAS}
           - name:  KAFKA_ZK_LOCAL
