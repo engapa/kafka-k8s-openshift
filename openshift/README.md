@@ -87,6 +87,7 @@ We recommend to use [minishift](https://github.com/minishift/minishift) in order
 Running Openshift cluster:
 
 ```bash
+$ minishift update
 $ minishift version
 minishift v1.6.0+7a71565
 $ minishift start [options]
@@ -99,7 +100,10 @@ openshift v3.6.0+c4dd4cf
 kubernetes v1.6.1+5115d708d7
 etcd 3.2.1
 ```
->NOTE: Minishift has configured the oc client correctly to connect to local Openshift cluster properly.
+>NOTE: minishift has configured the oc client correctly to connect to local Openshift cluster properly.
+
+It's possible to start an Openshift machine by the CLI directly, try `oc cluster up --create-machine`,
+or if you want to use a specific docker machine rather than create a VM then type `oc cluster up --docker-machine=<machine-name>`.
 
 Now Openshift cluster is ready to we could deploy the kafka cluster by the web console or through the shell command client (CLI):
 
