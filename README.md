@@ -1,3 +1,13 @@
+---
+title: My awesome post title
+description: "This post is about awesome stuff!"
+date: 2016-07-25
+thumbnail: 'http://url-to-thumbnail.jpg'
+layout: Post
+authors:
+  - FirstnameLastname
+---
+
 [![Build Status](https://travis-ci.org/engapa/kafka-k8s-openshift.svg?branch=master)](https://travis-ci.org/engapa/kafka-k8s-openshift)
 [![Docker Pulls](https://img.shields.io/docker/pulls/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
 [![Docker Stars](https://img.shields.io/docker/stars/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
