@@ -2,6 +2,7 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
 [![Docker Stars](https://img.shields.io/docker/stars/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
 [![Docker Layering](https://images.microbadger.com/badges/image/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
+[![Docker Version](https://images.microbadger.com/badges/version/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
 # Kafka Docker Image
 
 This project is meant to create an optimised docker image to run kafka containers as 'statefulset' into kubernetes/openshift.
