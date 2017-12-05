@@ -19,8 +19,8 @@ script:
 after_success:
 - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 - docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
-- if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker build --no-cache -t engapa/kafka:latest;
+- if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+    docker build --no-cache -t engapa/kafka:latest .;
     docker push engapa/kafka:latest;
   fi
 
