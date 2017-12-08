@@ -17,7 +17,7 @@ before_install:
   docker build --no-cache -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}
    -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 # export KUBE_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-- > curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBE_VERSION/bin/linux/amd64/kubectl
+- curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBE_VERSION/bin/linux/amd64/kubectl
 # Download minikube.
 - >
   curl -Lo minikube https://storage.googleapis.com/minikube/releases/$MINIKEBE_VERSION/minikube-linux-amd64 &&
