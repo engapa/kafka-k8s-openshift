@@ -29,7 +29,7 @@ install:
 - chmod +x kubectl && sudo mv kubectl /usr/local/bin/
 - minikube version
 - sudo minikube start --vm-driver=none --kubernetes-version=$KUBE_VERSION
-- minikube update-context
+- sudo minikube update-context
 - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
 - kubectl version
 
