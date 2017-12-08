@@ -42,7 +42,7 @@ before_script:
 script:
 - sed -i.bak "s/${SCALA_VERSION}-${KAFKA_VERSION}/${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}/g" k8s/kafka.yaml
 - kubectl create -f k8s/kafka.yaml
-- [ $(kubectl get pods --field-selector=status.phase==Running | grep kafka | wc -l) -gt 0 ] || exit 1
+- if [[ $(kubectl get pods --field-selector=status.phase==Running | grep kafka | wc -l) -gt 0 ]]; then exit 1; fi
 
 after_success:
 - docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
