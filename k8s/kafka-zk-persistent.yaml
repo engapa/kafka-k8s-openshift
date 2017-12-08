@@ -49,7 +49,7 @@ spec:
                   "matchExpressions": [{
                     "key": "kafka-name",
                     "operator": "In",
-                    "values": ["${NAME}"]
+                    "values": ["kafka"]
                   }]
                 },
                 "topologyKey": "kubernetes.io/hostname"

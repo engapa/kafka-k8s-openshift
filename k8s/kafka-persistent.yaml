@@ -39,7 +39,7 @@ metadata:
                   "matchExpressions": [{
                     "key": "kafka-name",
                     "operator": "In",
-                    "values": ["${NAME}"]
+                    "values": ["kafka"]
                   }]
                 },
                 "topologyKey": "kubernetes.io/hostname"
@@ -47,6 +47,9 @@ metadata:
             }
           }
 spec:
+  selector:
+    matchLabels:
+      zk-name: kafka
   serviceName: kafka
   replicas: 3
   template:
@@ -69,17 +72,44 @@ spec:
         - containerPort: 3888
           name: zkleader
         env:
-        - name: KAFKA_REPLICAS
+        - name:  KAFKA_VERSION
+          value: "1.0.0"
+        - name:  SCALA_VERSION
+          value: "2.12"
+        - name : KAFKA_REPLICAS
           value: "3"
         - name:  KAFKA_ZK_LOCAL
           value: "false"
-        - name:  SERVER_zookeeper_connection
+        - name:  KAFKA_HEAP_OPTS
+          value: "-Xmx1448M -Xms1448M"
+        - name:  SERVER_num_partitions
+          value: "1"
+        - name:  SERVER_delete_topic_enable
+          value: "true"
+        - name:  SERVER_log_retention_hours
+          value: "2147483647"
+        - name:  SERVER_zookeeper_connect
           value: "zk-0.zk:2181"
+        - name:  SERVER_log_dirs
+          value: "/opt/kafka/data/logs"
         - name:  SERVER_zookeeper_connection_timeout_ms
-          value: "300000"
+          value: "30000"
         livenessProbe:
           exec:
             command:
             - kafka_server_status.sh
           initialDelaySeconds: 15
           timeoutSeconds: 5
+        volumeMounts:
+        - name: kafka-data
+          mountPath: /opt/kafka/data
+  volumeClaimTemplates:
+  - metadata:
+      name: kafka-data
+      annotations:
+        volume.alpha.kubernetes.io/storage-class: anything
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
