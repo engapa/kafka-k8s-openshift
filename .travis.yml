@@ -17,6 +17,10 @@ before_install:
 - |
   docker build --no-cache -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD} \
    -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
+- docker run -d --name kafka engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}
+- docker exec -it kafka kafka_server_status.sh
+- docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+- docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}
 
 install:
 - k8s/main.sh install
@@ -25,9 +29,6 @@ after_install:
 - docker exec -it kafka kafka_server_status.sh
 - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 - docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}
-
-before_script:
-- k8s/main.sh install
 
 script:
 - k8s/main.sh test
