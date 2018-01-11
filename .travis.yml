@@ -17,16 +17,9 @@ before_install:
 - |
   docker build --no-cache -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD} \
    -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
-# export KUBE_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-- curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBE_VERSION/bin/linux/amd64/kubectl
-# Download minikube.
-- >
-  curl -Lo minikube https://storage.googleapis.com/minikube/releases/$MINIKUBE_VERSION/minikube-linux-amd64 &&
-   chmod +x minikube &&
-   sudo mv minikube /usr/local/bin/
 
 install:
-- docker run -it -d --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}
+- .k8s/docker run -it -d --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}
 - chmod +x kubectl && sudo mv kubectl /usr/local/bin/
 - minikube version
 - sudo minikube start --vm-driver=none --kubernetes-version=$KUBE_VERSION
@@ -40,12 +33,10 @@ after_install:
 - docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}
 
 before_script:
-- kubectl cluster-info
+- k8s/main.sh install
 
 script:
-- sed -i.bak "s/${SCALA_VERSION}-${KAFKA_VERSION}/${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}/g" k8s/kafka.yaml
-- kubectl create -f k8s/kafka.yaml
-- if [[ $(kubectl get pods --field-selector=status.phase==Running | grep kafka | wc -l) -gt 0 ]]; then exit 1; fi
+- k8s/main.sh test
 
 after_success:
 - docker push engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
@@ -56,4 +47,4 @@ after_success:
 
 after_script:
 - docker rm -f kafka
-- minikube delete
+- k8s/main.sh clean
