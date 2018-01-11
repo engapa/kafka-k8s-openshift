@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: kafka
   labels:
-    kafka-name: kafka
+    app: kafka
     component: kafka
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
@@ -17,16 +17,16 @@ spec:
     name: zkserver
   - port: 3888
     name: zkleader
-  clusterIP: None
+  kube: None
   selector:
-    kafka-name: kafka
+    app: kafka
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
   name: kafka
   labels:
-    kafka-name: kafka
+    app: kafka
     component: kafka
 spec:
   serviceName: kafka
@@ -34,7 +34,7 @@ spec:
   template:
     metadata:
       labels:
-        kafka-name: kafka
+        app: kafka
         component: kafka
     spec:
       containers:

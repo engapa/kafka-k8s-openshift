@@ -69,7 +69,7 @@ $ minikube dashboard
 To remove all resources related to one kafka cluster deployment launch this command:
 
 ```sh
-$ kubectl delete all,statefulset[,pvc] -l kafka-name=<name> [-n <namespace>|--all-namespaces]
+$ kubectl delete all,statefulset[,pvc] -l app=<name> [-n <namespace>|--all-namespaces]
 ```
 where '<name>' is the value of param NAME. Note that pvc resources are marked as optional in the command,
 it's up to you preserver or not the persistent volumes (by default when a pvc is deleted the persistent volume will be deleted as well).

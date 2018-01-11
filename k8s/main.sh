@@ -11,25 +11,11 @@ CHANGE_MINIKUBE_NONE_USER="true"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+ZK_IMAGE="engapa/zookeeper:3.4.11"
+
 SLEEP_TIME=5
 MAX_ATTEMPTS=10
 
-VOLUME="
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: data-kafka-INDEX
-  labels:
-    component: kafka
-spec:
-  storageClassName: anything
-  capacity:
-    storage: SIZE
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: '/tmp/data-kafka-INDEX'
-"
 
 function install(){
 
@@ -46,7 +32,7 @@ function install(){
   chmod +x minikube && sudo mv minikube /usr/local/bin/
 
   minikube version
-  sudo minikube start --vm-driver=none --kubernetes-version=$KUBE_VERSION
+  sudo minikube start --vm-driver=none --kubernetes-version=$KUBE_VERSION  --memory 4096
   sudo minikube update-context
 
   JSONPATH_NODES='{range .items[*]}{.metadata.name}:{range .status.conditions[*]}{.type}={.status};{end}{end}'
@@ -62,7 +48,18 @@ function install(){
 
   # Check kubernetes info
   kubectl version
-  kubec cluster-info
+  kubectl cluster-info
+}
+
+# $1: zookeper image
+function install_zk(){
+
+  echo "Deploying zookeeper ..."
+  kubectl run zk --image $ZK_IMAGE --port 2181 --labels="component=kafka,app=zk"
+  kubectl expose deploy zk --name zk --port=2181 --cluster-ip=None --labels="component=kafka,app=zk"
+  echo "Zookeeper running on zk.default.svc.cluster.local"
+  # TODO: Wait until kubectl get pods --field-selector=status.phase=Running
+
 }
 
 # $1 : file
@@ -94,8 +91,7 @@ function test(){
 
 function test-persistent(){
   # Given
-  echo "Creating persistent volumes /tmp/data-kafka (100Mi)"
-  for i in {0..2}; do mkdir -p /tmp/data-kafka-$i && echo $VOLUME | sed "s/INDEX/$i/g" | sed "s/SIZE/100Mi/g" | kubectl create -f -; done
+  install_zk
   file=$DIR/kafka-persistent.yaml
   # When
   kubectl create -f $file
@@ -113,8 +109,8 @@ function test-zk-persistent(){
 }
 
 function test-all(){
-  test && kubectl delete --force=true -l component=kafka all
-  test-persistent && kubectl delete --force=true -l component=kafka all && kubectl delete pv,pvc --all
+  test && kubectl delete --force=true -l component=kafka -l app=kafka all
+  test-persistent && kubectl delete --force=true -l component=kafka -l app=kafka all,pv,pvc
   test-zk-persistent
 }
 
