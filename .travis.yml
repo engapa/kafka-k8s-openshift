@@ -19,13 +19,7 @@ before_install:
    -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 
 install:
-- .k8s/docker run -it -d --name kafka -e "DEBUG_SETUP=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}-dev${TAVIS_BUILD}
-- chmod +x kubectl && sudo mv kubectl /usr/local/bin/
-- minikube version
-- sudo minikube start --vm-driver=none --kubernetes-version=$KUBE_VERSION
-- sudo minikube update-context
-- JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
-- kubectl version
+- k8s/main.sh install
 
 after_install:
 - docker exec -it kafka kafka_server_status.sh
