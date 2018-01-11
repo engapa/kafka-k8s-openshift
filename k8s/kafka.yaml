@@ -17,7 +17,7 @@ spec:
     name: zkserver
   - port: 3888
     name: zkleader
-  kube: None
+  clusterIP: None
   selector:
     app: kafka
 ---
