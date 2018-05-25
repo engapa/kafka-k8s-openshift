@@ -18,7 +18,7 @@ parameters:
 - name: KAFKA_VERSION
   description: Kafka Version (Scala and kafka version).
   required: true
-  value: "2.12-1.0.0"
+  value: "2.12-1.1.0"
 - name: SOURCE_IMAGE
   description: Container image source.
   value: kafka
@@ -86,7 +86,7 @@ objects:
   metadata:
     name: ${NAME}
     labels:
-      kafka-name: ${NAME}
+      app: ${NAME}
     annotations:
       service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   spec:
@@ -101,13 +101,13 @@ objects:
       name: zkleader
     clusterIP: None
     selector:
-      kafka-name: ${NAME}
+      app: ${NAME}
 - apiVersion: apps/v1beta1
   kind: StatefulSet
   metadata:
     name: ${NAME}
     labels:
-      kafka-name: ${NAME}
+      app: ${NAME}
   spec:
     podManagementPolicy: "Parallel"
     serviceName: ${NAME}
@@ -115,7 +115,7 @@ objects:
     template:
       metadata:
         labels:
-          kafka-name: ${NAME}
+          app: ${NAME}
           template: kafka-persistent
           component: kafka
         annotations:
@@ -127,7 +127,7 @@ objects:
                 "requiredDuringSchedulingIgnoredDuringExecution": [{
                   "labelSelector": {
                     "matchExpressions": [{
-                      "key": "kafka-name",
+                      "key": "app",
                       "operator": "In",
                       "values": ["${NAME}"]
                     }]

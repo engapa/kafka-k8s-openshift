@@ -51,7 +51,7 @@ spec:
     matchLabels:
       app: kafka
   serviceName: kafka
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:
@@ -61,7 +61,7 @@ spec:
       containers:
       - name: kafka
         imagePullPolicy: Always
-        image: engapa/kafka:2.12-1.0.0
+        image: engapa/kafka:2.12-1.1.0
         ports:
         - containerPort: 9092
           name: broker-port
@@ -73,7 +73,7 @@ spec:
           name: zkleader
         env:
         - name:  KAFKA_VERSION
-          value: "1.0.0"
+          value: "1.1.0"
         - name:  SCALA_VERSION
           value: "2.12"
         - name : KAFKA_REPLICAS
@@ -98,8 +98,8 @@ spec:
           exec:
             command:
             - kafka_server_status.sh
-          initialDelaySeconds: 15
-          timeoutSeconds: 5
+          initialDelaySeconds: 30
+          timeoutSeconds: 15
         volumeMounts:
         - name: data
           mountPath: /opt/kafka/data
@@ -114,8 +114,7 @@ spec:
       annotations:
         volume.beta.kubernetes.io/storage-class: standard
     spec:
-      storageClassName: standard
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Mi
+          storage: 80Mi

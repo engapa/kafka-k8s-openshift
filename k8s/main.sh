@@ -3,9 +3,10 @@
 set -e
 
 SCALA_VERSION=${SCALA_VERSION:-"2.12"}
-KAFKA_VERSION=${KAFKA_VERSION:-"1.0.0"}
-MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v0.24.1"}
-KUBE_VERSION=${KUBE_VERSION:-"v1.8.0"}
+KAFKA_VERSION=${KAFKA_VERSION:-"1.1.0"}
+KAFKA_IMAGE=${KAFKA_IMAGE:-"engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}"}
+MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v0.27.0"}
+KUBE_VERSION=${KUBE_VERSION:-"v1.10.3"}
 
 CHANGE_MINIKUBE_NONE_USER="true"
 
@@ -13,7 +14,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ZK_IMAGE="engapa/zookeeper:3.4.11"
 
-SLEEP_TIME=5
+SLEEP_TIME=8
 MAX_ATTEMPTS=10
 
 
@@ -41,7 +42,7 @@ function install(){
    sleep $SLEEP_TIME
    attempts=`expr $attempts + 1` 
    if [[ $attempts -gt $MAX_ATTEMPTS ]]; then
-     echo "Max number of attempts was reached (${MAX_ATTEMPTS})"
+     echo "ERROR: Max number of attempts was reached (${MAX_ATTEMPTS})"
      exit 1
    fi
   done
@@ -49,6 +50,12 @@ function install(){
   # Check kubernetes info
   kubectl version
   kubectl cluster-info
+}
+
+function conf(){
+
+  sed -i -e "s/image:.*/image: $KAFKA_IMAGE/" $1
+
 }
 
 # $1: zookeper image
@@ -72,7 +79,7 @@ function check(){
     sleep $SLEEP_TIME
     attempts=`expr $attempts + 1`
     if [[ $attempts -gt $MAX_ATTEMPTS ]]; then
-      echo "Max number of attempts was reached (${MAX_ATTEMPTS})"
+      echo "ERROR: Max number of attempts was reached (${MAX_ATTEMPTS})"
       exit 1
     fi
    echo "Retry [${attempts}] ... "
@@ -82,6 +89,7 @@ function check(){
 function test(){
   # Given
   file=$DIR/kafka.yaml
+  conf $file
   # When
   kubectl create -f $file
   # Then

@@ -60,7 +60,7 @@ spec:
       containers:
       - name: kafka
         imagePullPolicy: IfNotPresent
-        image: engapa/kafka:2.12-1.0.0
+        image: engapa/kafka:2.12-1.1.0
         resources:
           requests:
             memory: 2Gi
@@ -79,7 +79,7 @@ spec:
           name: zkleader
         env:
         - name:  KAFKA_VERSION
-          value: "1.0.0"
+          value: "1.1.0"
         - name:  SCALA_VERSION
           value: "2.12"
         - name : KAFKA_REPLICAS
