@@ -5,8 +5,8 @@ dist: trusty
 env:
   SCALA_VERSION: "2.12"
   KAFKA_VERSION: "2.0.0"
-  MINIKUBE_VERSION: "v0.27.0"
-  KUBE_VERSION: "v1.10.3"
+  MINIKUBE_VERSION: "v0.28.2"
+  KUBE_VERSION: "v1.11.3"
   CHANGE_MINIKUBE_NONE_USER: "true"
 
 services:
