@@ -62,7 +62,11 @@ parameters:
   description: Kafka logs capacity.
   required: true
   value: "10Gi"
-- name: VOLUME_ZK_CAPACITY
+- name: VOLUME_ZK_DATA_CAPACITY
+  description: Zookeeper data capacity
+  required: true
+  value: "1Gi"
+- name: VOLUME_ZK_DATALOG_CAPACITY
   description: Zookeeper data capacity
   required: true
   value: "1Gi"
