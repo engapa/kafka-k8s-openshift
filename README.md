@@ -12,7 +12,7 @@ This project is meant to create an optimised docker image to run kafka container
 ```bash
 $ export KAFKA_HOME="/opt/kafka"
 $ export SCALA_VERSION="2.12"
-$ export KAFKA_VERSION="1.1.0"
+$ export KAFKA_VERSION="2.0.0"
 $ docker build --build-arg SCALA_VERSION=$SCALA_VERSION --build-arg KAFKA_VERSION=$KAFKA_VERSION --build-arg KAFKA_HOME=$KAFKA_HOME \
 -t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 ```
@@ -74,7 +74,7 @@ LOWER            : false
 [2017-01-31 20:17:28,150] INFO Socket connection established to localhost/127.0.0.1:2181, initiating session (org.apache.zookeeper.ClientCnxn)
 [2017-01-31 20:17:28,308] INFO Session establishment complete on server localhost/127.0.0.1:2181, sessionid = 0x159f62cc8c00000, negotiated timeout = 6000 (org.apache.zookeeper.ClientCnxn)
 ...
-[2017-01-31 20:17:29,646] INFO Kafka version : 1.1.0 (org.apache.kafka.common.utils.AppInfoParser)
+[2017-01-31 20:17:29,646] INFO Kafka version : 2.0.0 (org.apache.kafka.common.utils.AppInfoParser)
 [2017-01-31 20:17:29,646] INFO Kafka commitId : f10ef2720b03b247 (org.apache.kafka.common.utils.AppInfoParser)
 [2017-01-31 20:17:29,647] INFO [Kafka Server 1001], started (kafka.server.KafkaServer)
 ```

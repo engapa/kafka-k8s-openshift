@@ -61,7 +61,7 @@ spec:
       containers:
       - name: kafka
         imagePullPolicy: Always
-        image: engapa/kafka:2.12-1.1.0
+        image: engapa/kafka:2.12-2.0.0
         ports:
         - containerPort: 9092
           name: broker-port
@@ -73,7 +73,7 @@ spec:
           name: zkleader
         env:
         - name:  KAFKA_VERSION
-          value: "1.1.0"
+          value: "2.0.0"
         - name:  SCALA_VERSION
           value: "2.12"
         - name : KAFKA_REPLICAS
