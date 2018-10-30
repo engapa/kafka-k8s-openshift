@@ -3,6 +3,7 @@ jobs:
   docker:
     docker:
     - image: docker
+    tty: true
     steps:
     - setup_remote_docker:
         docker_layer_caching: true
