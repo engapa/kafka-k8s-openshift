@@ -5,6 +5,7 @@ set -e
 SCALA_VERSION=${SCALA_VERSION:-"2.12"}
 KAFKA_VERSION=${KAFKA_VERSION:-"2.0.0"}
 KAFKA_IMAGE=${KAFKA_IMAGE:-"engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}"}
+ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION:-'3.4.13'}"
 MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v0.28.2"}
 KUBE_VERSION=${KUBE_VERSION:-"v1.11.3"}
 
@@ -12,39 +13,54 @@ CHANGE_MINIKUBE_NONE_USER="true"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-ZK_IMAGE="engapa/zookeeper:3.4.13"
-
 SLEEP_TIME=8
 MAX_ATTEMPTS=10
 
-
-function install(){
+function kubectl()
+{
 
   if [[ "${KUBE_VERSION}" == 'latest' ]]; then
     KUBE_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
   fi
 
   # Download kubectl.
-  curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBE_VERSION}/bin/linux/amd64/kubectl
-  chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+  distro=$(uname -s | tr '[:upper:]' '[:lower:]')
+  curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBE_VERSION}/bin/$distro/amd64/kubectl
+  chmod +x kubectl
 
+  ./kubectl version --client
+}
+
+function minikube()
+{
   # Download minikube.
-  curl -Lo minikube https://storage.googleapis.com/minikube/releases/${MINIKUBE_VERSION}/minikube-linux-amd64
-  chmod +x minikube && sudo mv minikube /usr/local/bin/
+  distro=$(uname -s | tr '[:upper:]' '[:lower:]')
+  curl -Lo minikube https://storage.googleapis.com/minikube/releases/${MINIKUBE_VERSION}/minikube-$distro-amd64
+  chmod +x minikube
 
-  minikube version
-  sudo minikube start --vm-driver=none --kubernetes-version=$KUBE_VERSION  --memory 4096
-  sudo minikube update-context
+  ./minikube version
+}
 
-  JSONPATH_NODES='{range .items[*]}{.metadata.name}:{range .status.conditions[*]}{.type}={.status};{end}{end}'
-  attempts=0
-  until kubectl get nodes -o jsonpath="$JSONPATH_NODES" 2>&1 | grep -q "Ready=True"; do
-   sleep $SLEEP_TIME
-   attempts=`expr $attempts + 1` 
-   if [[ $attempts -gt $MAX_ATTEMPTS ]]; then
-     echo "ERROR: Max number of attempts was reached (${MAX_ATTEMPTS})"
-     exit 1
-   fi
+function minikube_run()
+{
+
+  export MINIKUBE_WANTUPDATENOTIFICATION=false
+  export MINIKUBE_WANTREPORTERRORPROMPT=false
+  export MINIKUBE_HOME=$HOME
+  export CHANGE_MINIKUBE_NONE_USER=true
+  mkdir -p $HOME/.kube
+  touch $HOME/.kube/config
+
+  export KUBECONFIG=$HOME/.kube/config
+  sudo -E ./minikube start --vm-driver=none
+
+  # this for loop waits until kubectl can access the api server that Minikube has created
+  for i in {1..150}; do # timeout for 5 minutes
+     ./kubectl get po &> /dev/null
+     if [ $? -ne 1 ]; then
+        break
+    fi
+    sleep 2
   done
 
   # Check kubernetes info
@@ -52,14 +68,16 @@ function install(){
   kubectl cluster-info
 }
 
-function conf(){
+function conf()
+{
 
   sed -i -e "s/image:.*/image: $KAFKA_IMAGE/" $1
 
 }
 
 # $1: zookeper image
-function install_zk(){
+function zk_install()
+{
 
   echo "Deploying zookeeper ..."
   kubectl run zk --image $ZK_IMAGE --port 2181 --labels="component=kafka,app=zk"
@@ -71,7 +89,8 @@ function install_zk(){
 
 # $1 : file
 # $2 : Number of replicas
-function check(){
+function check()
+{
 
   attempts=0
   JSONPATH_STSETS='replicasOk={.items[?(@.kind=="StatefulSet")].status.readyReplicas}'
@@ -86,7 +105,8 @@ function check(){
   done
 }
 
-function test(){
+function test()
+{
   # Given
   file=$DIR/kafka.yaml
   conf $file
@@ -97,7 +117,8 @@ function test(){
   # TODO: Use kafka client to validate e2e
 }
 
-function test-persistent(){
+function test-persistent()
+{
   # Given
   install_zk
   file=$DIR/kafka-persistent.yaml
@@ -107,7 +128,8 @@ function test-persistent(){
   check $file 3
 }
 
-function test-zk-persistent(){
+function test-zk-persistent()
+{
   # Given
   file=$DIR/kafka-zk-persistent.yaml
   # When
@@ -116,38 +138,26 @@ function test-zk-persistent(){
   check file 1
 }
 
-function test-all(){
+function test-all()
+{
   test && kubectl delete --force=true -l component=kafka -l app=kafka all
   test-persistent && kubectl delete --force=true -l component=kafka -l app=kafka all,pv,pvc
   test-zk-persistent
 }
 
-function clean(){
+function clean() # Destroy minikube vm
+{
   echo "Cleaning ...."
   minikube delete
 }
 
-# Main options
-case "$1" in
-  install)
-    install
-    ;;
-  test)
-    test
-    ;;
-  test-persistent)
-    test-persistent
-    ;;
-  test-zk-persistent)
-    test-zk-persistent
-    ;;
-  test-all)
-    test-all
-    ;;
-  clean)
-    clean
-    ;;
-  *)
-    echo "Usage: $0 {install|test|test-persistent|test-zk-persistent|test-all|clean}"
-    exit 1
-esac
+function help() # Show a list of functions
+{
+    declare -F -p | cut -d " " -f 3
+}
+
+if [ "_$1" = "_" ]; then
+    help
+else
+    "$@"
+fi
