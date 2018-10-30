@@ -121,7 +121,7 @@ Also you may use `--env-file` option to load these variables from a file.
 
 And, of course, you could provide your own property files directly by option `-v` and don't use `kafka_setup` and `kafka_server` scripts.
 
-The override option of kafka server is preserved and anybody can use it on this way :
+The override option of kafka server is preserved and anybody can use it on this way:
 
 ```bash
 $ docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} \
@@ -135,7 +135,7 @@ $ docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VER
 ### Run local zookeeper
 
 By default, when someone launches  `kafka_server.sh start` a zookeeper process is started too.
-This behaviour is managed by the env variable KAFKA_ZK_LOCAL (whit **true** as default value).
+This behaviour is managed by the env variable KAFKA_ZK_LOCAL (defaults to true).
 
 ### External zookeeper
 
@@ -144,7 +144,7 @@ If you want to deploy a kafka server w/o local zookeeper then you should provide
 * KAFKA_ZK_LOCAL=false
 * SERVER_zookeeper_connect=\<zookeeper_host:zookeeper_port\>\[,\<zookeeper_host:zookeeper_port\>\]
 
-For instance :
+For instance:
 
 ```bash
 $ docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_zookeeper_connect=zookeeperserver1:2181,zookeeperserver2:2181,zookeeperserver3:2181" \

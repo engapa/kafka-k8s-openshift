@@ -26,7 +26,7 @@ function kubectl()
   fi
 
   # Download kubectl
-  curl -L0 kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBE_VERSION}/bin/$DISTRO/amd64/kubectl
+  curl -LO kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBE_VERSION}/bin/$DISTRO/amd64/kubectl
   chmod +x kubectl
 
 }
@@ -39,7 +39,7 @@ function minikube()
 
 }
 
-function minikube_run()
+function minikube-run()
 {
 
   export MINIKUBE_WANTUPDATENOTIFICATION=false

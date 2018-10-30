@@ -7,7 +7,7 @@ KAFKA_VERSION=${KAFKA_VERSION:-"2.0.0"}
 KAFKA_IMAGE=${KAFKA_IMAGE:-"engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}"}
 ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION:-'3.4.13'}"
 
-MINISHIFT_VERSION=${MINIKUBE_VERSION:-"v0.30.0"}
+MINISHIFT_VERSION=${MINISHIFT_VERSION:-"v1.26.1"}
 
 CHANGE_MINISHIFT_NONE_USER="true"
 
@@ -36,7 +36,7 @@ function minishift()
   chmod a+x minishift
 }
 
-function minishift_run()
+function minishift-run()
 {
 
   export MINISHIFT_HOME=$HOME

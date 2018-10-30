@@ -11,7 +11,7 @@ KUBE_VERSION         ?= v1.11.3
 MINIKUBE_VERSION     ?= v0.30.0
 
 OC_VERSION           ?= v3.11.0
-MINISHIFT_VERSION    ?= v3.11.0
+MINISHIFT_VERSION    ?= v1.26.1
 
 .PHONY: help
 help: ## Show this help
@@ -76,4 +76,4 @@ minishift-test: ## Launch tests on minishift
 minishift-clean: ## Remove minishift
 	@openshift/main.sh clean
 
-## TODO: helm, ksonnet
+## TODO: helm, ksonnet for deploy on kubernetes

@@ -117,9 +117,9 @@ Both cases haven't persistent storage and would be appropriated for testing purp
 For production environments we recommend you to use the template in file `kafka-persistent` (`KAFKA_ZK_LOCAL=false` and `SERVER_zookeeper_connect` with zookeeper services).
 In both cases we'll have persistent storage (even for the zookeeper process).
 
-## Examples
+### Examples
 
-###Ephemeral cluster with Zookeeper sidecar (DEV environment)
+#### Ephemeral cluster with Zookeeper sidecar (DEV environment)
 
 Optionally users can choose run an internal zookeeper cluster by configuring these parameters:
 
@@ -134,7 +134,7 @@ $ oc new-app kafka -p REPLICAS=1 -p ZK_LOCAL=true -p SOURCE_IMAGE=172.30.1.1:500
 The number of nodes must be a valid quorum for zookeeper (1, 3, 5, ...).
 For example, if you want to have a quorum of 3 zookeeper nodes, then we'll have got 3 kafka brokers too.
 
-### Persistent storage with external Zookeeper (PROD environment)
+#### Persistent storage with external Zookeeper (PROD environment)
 
 First of all, [deploy a zookeeper cluster](https://github.com/engapa/zookeeper-k8s-openshift).
 
@@ -147,7 +147,7 @@ $ oc new-app kafka -p SERVER_zookeeper_connect=<zookeeper-nodes> -p SOURCE_IMAGE
 
 To remove all resources related to one kafka cluster deployment launch this command:
 
-```sh
+```bash
 $ oc delete all,statefulset[,pvc] -l app=<name> [-n <namespace>|--all-namespaces]
 ```
 where '\<name\>' is the value of param NAME. Note that pvc resources are marked as optional in the command,
@@ -156,19 +156,19 @@ Type the namespace option if you are in a different namespace that resources are
 
 It's possible delete all resources created from this template:
 
-```sh
+```bash
 $ oc delete all,statefulset[,pvc] -l template=kafka[-zk][-persistent] [-n <namespace>] [--all-namespaces]
 ```
 
 Also someone can remove all resources of type kafka, belong to all clusters and templates:
 
-```sh
+```bash
 $ oc delete all,statefulset[,pvc] -l component=kafka [-n <namespace>] [--all-namespaces]
 ```
 
 To remove the templates:
 
-```sh
+```bash
 $ oc delete template kafka-builder
 $ oc delete template kafka[-zk][-persistent] [-n <namespace>] [--all-namespaces]
 ```
