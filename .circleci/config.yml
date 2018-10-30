@@ -87,12 +87,12 @@ workflows:
         filters:
           branches:
             only: master
-#    - k8s:
-#        requires:
-#        - docker
-#        filters:
-#          branches:
-#            only: master
+    - k8s:
+        requires:
+        - docker
+        filters:
+          branches:
+            only: master
 #    - openshift:
 #        requires:
 #        - docker
