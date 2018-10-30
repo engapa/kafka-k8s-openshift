@@ -43,7 +43,7 @@ docker-push: ## Publish docker images
 	@docker push $(DOCKER_ORG)/$(DOCKER_IMAGE):$(SCALA_VERSION)-$(KAFKA_VERSION)
 
 .PHONY: minikube
-minikube-reqs: ## Install minikube and kubectl
+minikube: ## Install minikube and kubectl
 	@k8s/main.sh minikube
 	@k8s/main.sh kubectl
 
