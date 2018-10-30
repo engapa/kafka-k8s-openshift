@@ -3,6 +3,7 @@
 [![Docker Stars](https://img.shields.io/docker/stars/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
 [![Docker Layering](https://images.microbadger.com/badges/image/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
 [![Docker Version](https://images.microbadger.com/badges/version/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift?ref=badge_shield)
 # Kafka Docker Image
 
 This project is meant to create an optimised docker image to run kafka containers as 'statefulset' into kubernetes/openshift.
@@ -155,3 +156,7 @@ In [openshift directory](openshift) there are some examples of Openshift templat
 # Author
 
 Enrique Garcia **engapa@gmail.com**
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift?ref=badge_large)
