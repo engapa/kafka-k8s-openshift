@@ -6,36 +6,101 @@ The resources here are templates for Openshift catalog.
 
 It isn't necessary to clone this repo, you can use the resources directly trough the URLs ("https://raw.githubusercontent.com/engapa/kafka-k8s-openshift/master/openshift/\<resource\>".
 
+## Requirements
+
+- [oc](https://github.com/openshift/origin/releases) (openshift client, 3.10 \>=)
+- Openshift cluster (3.10 \>=)
+
+### DEV environment
+
+We'll use only opensource, that's 'openshift origin'.
+
+[Minishift](https://github.com/minishift/minishift) is the simplest way to get a local Openshift installation on our workstation.
+After install the command client check everything is alright to continue:
+
+```bash
+[$ minishift update]
+$ minishift version
+minishift v1.26.1+1e20f27
+$ minishift start [options]
+...
+Version: v3.11.0
+...
+$ minishift openshift version
+openshift v3.11.0+57f8760-31
+```
+>NOTE: minishift has configured the oc client correctly to connect to local Openshift cluster properly.
+
+```bash
+oc version
+oc v3.11.0+0cbc58b
+kubernetes v1.11.0+d4cacc0
+features: Basic-Auth
+
+Server https://192.168.2.32:8443
+kubernetes v1.11.0+d4cacc0
+```
+
+Login with admin user and provide a password:
+
+```bash
+$ oc login -u admin -p xxxxx
+```
+
+Create a new project:
+
+```bash
+$ oc new-project test 
+```
+
+You may use the Openshift dashboard (`minishift console`) if you prefer to do those steps through the web interface.
+
+> TRICK: Login as cluster admin: `oc login -u system:admin -n default`,
+ change permissions of default scc `oc edit scc restricted` and change runAsUser.type value to RunAsAny.
+ 
+
+For local environment we'll use a non persistent deployments (kafka.yaml)
+
+### PROD environment
+
+To connect to external cluster we need to know the URL to login with your credentials.
+
+For production environments we'll use zookeeper and kafka deployments with persistence.
+
+We recommend you to use zookeeper template **zk-persistent.yaml** at https://github.com/engapa/zookeeper-k8s-openshift/tree/master/openshift.
+
+This means that although pods are destroyed all data are safe under persistent volumes, and when pod are recreated the volumes will be attached again.
+
+The statefulset objects have an "antiaffinity" pod scheduler policy so pods will be allocated in separate nodes.
+It's required the same number of nodes that the max value of parameter `ZOO_REPLICAS` or `KAFKA_REPLICAS`.
+
 ## Building the image
 
-This is an optional step, you can always use the [public images at dockerhub](https://hub.docker.com/r/engapa/kafka) which are automatically uploaded.
+This is a recommended step, although you can always use the [public images at dockerhub](https://hub.docker.com/r/engapa/kafka) which are automatically uploaded with CI of this project.
 
-Anyway, if you prefer to build the image in your private Openshift registry just follow these instructions:
+To build and save a docker image of kafka in your private Openshift registry just follow these instructions:
 
 1 - Create an image builder and build the container image
 
 ```bash
 $ oc create -f buildconfig.yaml
-$ oc new-app kafka-builder -p IMAGE_STREAM_VERSION="2.12-2.0.0" -p GITHUB_REF="v2.12-1.1.0"
+$ oc new-app kafka-builder -p GITHUB_REF="v2.12-1.1.0" -p IMAGE_STREAM_VERSION="2.12-2.0.0"
 ```
+If you want to get an image from another git commit:
 
-Explore the command `oc new-build` to create a builder via shell command client.
+```bash
+$ oc start-build kafka-builder --commit=master
+```
 
 2 - Check that image is ready to use
 
 ```bash
 $ oc get is -l component=zk [-n project]
 NAME    DOCKER REPO                       TAGS           UPDATED
-kafka   172.30.1.1:5000/myproject/kafka   2.12-2.0.0  1 days ago
+kafka   172.30.1.1:5000/test/kafka      2.12-2.0.0      1 days ago
 ```
 
-3 - If you want to use this local/private image from containers on other projects then use the "\<project\>/NAME" value as `SOURCE_IMAGE` parameter value, and use one value of "TAGS" as `ZOO_VERSION` parameter value (e.g: myproject/zookeeper:3.4.10).
-
-4 - \[Optional\] Launch the builder again with another commit or whenever you want:
-
-```bash
-$ oc start-build kafka-builder --commit=master
-```
+**NOTE**: If you want to use this local/private image from containers on other projects then use the "\<project\>/NAME" value as `SOURCE_IMAGE` parameter value, and use one value of "TAGS" as `KAFKA_VERSION` parameter value (e.g: test/kafka:2.12-2.0.0).
 
 ## Topologies
 
@@ -46,14 +111,15 @@ Users can choose how to connect to a zookeeper cluster by configuring these para
 * KAFKA_ZK_LOCAL: set to 'true' value if an internal zookeeper process should be run. Change to 'false' if you have a reachable zookeeper cluster to connect to.
 * SERVER_zookeeper_connect=\<your-zookeeper-nodes\>. This property is required if `KAFKA_ZK_LOCAL=false` in other case the connection string will be auto-generated.
 
-The resource `kafka.yaml` can be launched with internal (`KAFKA_ZK_LOCAL=true`) or external (`KAFKA_ZK_LOCAL=false` and `SERVER_zookeeper_connect`) zookeeper.
+The resource `kafka.yaml` can be launched with internal (`KAFKA_ZK_LOCAL=true`) or external zookeeper (`KAFKA_ZK_LOCAL=false` and `SERVER_zookeeper_connect`).
 Both cases haven't persistent storage and would be appropriated for testing purposes.
 
-For production environments we recommend you to use resources with suffix `persistent` (`KAFKA_ZK_LOCAL=false` and `SERVER_zookeeper_connect`) or `zk-persistent` (`KAFKA_ZK_LOCAL=true`).
+For production environments we recommend you to use the template in file `kafka-persistent` (`KAFKA_ZK_LOCAL=false` and `SERVER_zookeeper_connect` with zookeeper services).
 In both cases we'll have persistent storage (even for the zookeeper process).
 
 ## Examples
-#### Ephemeral cluster with Zookeeper sidecar
+
+###Ephemeral cluster with Zookeeper sidecar (DEV environment)
 
 Optionally users can choose run an internal zookeeper cluster by configuring these parameters:
 
@@ -62,74 +128,19 @@ Optionally users can choose run an internal zookeeper cluster by configuring the
 
 ```bash
 $ oc create -f kafka.yaml
-$ oc new-app kafka -p REPLICAS=1 -p ZK_LOCAL=true [-p SOURCE_IMAGE=172.30.1.1:5000/myproject/kafka]
+$ oc new-app kafka -p REPLICAS=1 -p ZK_LOCAL=true -p SOURCE_IMAGE=172.30.1.1:5000/test/kafka
 ```
-
-> NOTE: params between '[]' characters are optional.
 
 The number of nodes must be a valid quorum for zookeeper (1, 3, 5, ...).
 For example, if you want to have a quorum of 3 zookeeper nodes, then we'll have got 3 kafka brokers too.
 
-#### Persistent storage with external Zookeeper
+### Persistent storage with external Zookeeper (PROD environment)
 
 First of all, [deploy a zookeeper cluster](https://github.com/engapa/zookeeper-k8s-openshift).
 
 ```bash
-$ oc create -f kafka[-zk]-persistent.yaml
-$ oc new-app kafka -p SERVER_zookeeper_connect=<zookeeper-nodes> [-p SOURCE_IMAGE=172.30.1.1:5000/myproject/kafka]
-```
-
-## Local testing
-
-We recommend to use [minishift](https://github.com/minishift/minishift) in order to get quickly a standalone Openshift cluster.
-
-Running Openshift cluster:
-
-```bash
-$ minishift update
-$ minishift version
-minishift v1.6.0+7a71565
-$ minishift start [options]
-...
-Starting OpenShift using openshift/origin:v3.6.0 ...
-Pulling image openshift/origin:v3.6.0
-...
-$ minishift openshift version
-openshift v3.6.0+c4dd4cf
-kubernetes v1.6.1+5115d708d7
-etcd 3.2.1
-```
->NOTE: minishift has configured the oc client correctly to connect to local Openshift cluster properly.
-
-It's possible to start an Openshift machine by the CLI directly, try `oc cluster up --create-machine`,
-or if you want to use a specific docker machine rather than create a VM then type `oc cluster up --docker-machine=<machine-name>`.
-
-Now Openshift cluster is ready to we could deploy the kafka cluster by the web console or through the shell command client (CLI):
-
-1 - Using the web console:
-
-```bash
-$ minishift console
-```
-
-The URL is in the output lines of `minishift start` command.
-
-For the first time enter a username and password, and create a project.
-Once we are in the project go to section **Import YAML / JSON** and write or select the content/file of [our template](buildconfig.yaml) to build the docker image.
-
-Type next command to get the same effect:
-
-== TRICK: Change permissions of default scc, `oc eidt scc restricted` and change runAsUser.type to RunAsAny ==
-
-```bash
-$ oc process -f buildconfig.yaml | oc create -f -
-```
-
-2 - Launch kafka cluster creation:
-
-```bash
-$ oc create -f kafka[-zk][-persistent].yaml
-$ oc new-app kafka [-p parameter=value]
+$ oc create -f kafka-persistent.yaml
+$ oc new-app kafka -p SERVER_zookeeper_connect=<zookeeper-nodes> -p SOURCE_IMAGE=172.30.1.1:5000/test/kafka
 ```
 
 ## Clean up

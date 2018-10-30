@@ -10,7 +10,7 @@ jobs:
     - run:
         name: Docker login
         command: |
-          printf 'y' | docker login -u= -p=${DOCKER_PASSWORD}
+          printf "${DOCKER_PASSWORD}" | docker login -u=${DOCKER_USERNAME}
     - run:
         name: Install essentials
         command: |
