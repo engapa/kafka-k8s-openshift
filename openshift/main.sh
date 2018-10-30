@@ -131,7 +131,7 @@ function test-all()
   test-zk-persistent
 }
 
-function clean() # Destroy minikube vm
+function clean() # Destroy minishift vm
 {
   echo "Cleaning ...."
   ./minishift delete

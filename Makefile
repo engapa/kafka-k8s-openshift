@@ -49,7 +49,7 @@ minikube: ## Install minikube and kubectl
 
 .PHONY: minikube-run
 minikube-run: ## Run minikube
-	@k8s/main.sh minikube_run
+	@k8s/main.sh minikube-run
 
 .PHONY: minikube-test
 minikube-test: ## Launch tests on minikube
@@ -66,7 +66,7 @@ minishift: ## Install minishift and oc
 
 .PHONY: minishift-run
 minishift-run: ## Run minishift
-	@openshift/main.sh minikube-run
+	@openshift/main.sh minishift-run
 
 .PHONY: minishift-test
 minishift-test: ## Launch tests on minishift
