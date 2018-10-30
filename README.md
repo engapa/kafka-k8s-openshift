@@ -1,14 +1,21 @@
-[![Build Status](https://travis-ci.org/engapa/kafka-k8s-openshift.svg?branch=master)](https://travis-ci.org/engapa/kafka-k8s-openshift)
+# Kafka Docker Image 
+[![Build status](https://circleci.com/gh/engapa/kafka-k8s-openshift/tree/master.svg?style=svg "Build status")](https://circleci.com/gh/engapa/kafka-k8s-openshift/tree/master)
+[![License status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift.svg?type=shield "License status")](https://app.fossa.io/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift?ref=badge_shield)
 [![Docker Pulls](https://img.shields.io/docker/pulls/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
-[![Docker Stars](https://img.shields.io/docker/stars/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
 [![Docker Layering](https://images.microbadger.com/badges/image/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
 [![Docker Version](https://images.microbadger.com/badges/version/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
-# Kafka Docker Image
+![OSS](https://badges.frapsoft.com/os/v1/open-source.svg?v=103 "We love OpenSource")
 
 This project is meant to create an optimised docker image to run kafka containers as 'statefulset' into kubernetes/openshift.
 
-# Build an image
+# Build and publish a kafka image
 
+To get a docker image ready with default values type:
+
+```bash
+$ make clean-all docker-build docker-test docker-push 
+```
+To get a custom image:
 ```bash
 $ export KAFKA_HOME="/opt/kafka"
 $ export SCALA_VERSION="2.12"
@@ -23,17 +30,17 @@ The built docker image will contain a kafka distribution (${SCALA_VERSION}-${KAF
 
 The provided scripts are:
 
-* kafka_download.sh : This script is used to download the suitable release.
-* kafka_env.sh : It purpose is load the default environments variables.
-* kafka_setup.sh : Configure kafka and zookeeper dynamically , based on [utils-docker project](https://github.com/engapa/utils-docker)
-* kafka_server.sh : A central script to manage kafka and optional zookeeper processes.
-* kafka_server_status.sh : Checks kafka server status.
+* **kafka_download.sh** : This script is used to download the suitable release.
+* **kafka_env.sh** : It purpose is load the default environments variables.
+* **kafka_setup.sh** : Configure kafka and zookeeper dynamically , based on [utils-docker project](https://github.com/engapa/utils-docker)
+* **kafka_server.sh** : A central script to manage kafka and optional zookeeper processes.
+* **kafka_server_status.sh** : Checks kafka server status.
 
 # Run a container
 
 Default `CMD` runs a kafka server with a zookeeper subprocess.
 
-The below example shows you how to run a docker all-in-one container with kafka and zookeeper :
+The below example shows you how to run an all-in-one docker kafka container (with zookeeper as sidecar) :
 
 ```bash
 $ docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
@@ -103,7 +110,7 @@ CONN_LOG4J_ | connect-log4j.properties | CONN_LOG4J_log4j_rootLogger=INFO, stdou
 CONN_STANDALONE_ | connect-standalone.properties | CONN_STANDALONE_bootstrap_servers=localhost:9092 --> bootstrap.servers=localhost:9092
 TOOLS_LOG4J_ | tools-log4j.properties | TOOLS_LOG4J_log4j_appender_stderr_Target=System.err --> log4j.appender.stderr.Target=System.err
 
-So we can configure our kafka server in docker run time :
+So we can configure our kafka server via environment variables :
 
 ```bash
 $ docker run -it -d -e "LOG4J_log4j_rootLogger=DEBUG, stdout" -e "SERVER_log_retention_hours=24"\
@@ -150,7 +157,11 @@ In [k8s directory](k8s) there are some examples and utilities for Kubernetes
 
 # Openshift
 
-In [openshift directory](openshift) there are some examples of Openshift templates.
+In [openshift directory](openshift) there are some resources for Openshift.
+
+#License
+
+[![License status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fengapas%2Fkafka-k8s-openshift?ref=badge_large)
 
 # Author
 

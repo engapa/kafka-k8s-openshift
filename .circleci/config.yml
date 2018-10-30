@@ -1,0 +1,107 @@
+version: 2
+jobs:
+  docker_job:
+    docker:
+    - image: docker
+    steps:
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - checkout
+    - run:
+        name: Docker login
+        command: |
+          printf 'y' | docker login -u= -p=${DOCKER_PASSWORD}
+    - run:
+        name: Install essentials
+        command: |
+          apk add --no-cache --virtual .build-deps make gcc
+    - run:
+        name: build docker image
+        command: |
+          make docker-build
+    - run:
+        name: test of docker image
+        command: |
+          make docker-test
+    - run:
+        name: publish docker image
+        command: |
+          make docker-push
+          if [ "$CIRCLE_BRANCH" == "master" ]; then
+              docker build --no-cache -t ${DOCKER_USERNAME}/kafka:latest .;
+              docker push ${DOCKER_USERNAME}/kafka:latest;
+          fi
+  k8s:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: run minikube
+          command: make minikube-reqs minikube-run
+      - run:
+          name: run kafka tests
+          command: |
+            make k8s-test
+      - run:
+          name: delete minikube
+          command: |
+            k8s/main.sh clean
+  helm:
+    docker:
+    - image: lachlanevenson/k8s-helm
+      entrypoint: /bin/sh
+    steps:
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - checkout
+    - run:
+        name: install essentials
+        command: |
+          apk add --no-cache --virtual .build-deps make gcc
+    - run:
+        name: Helm package
+        command: |
+          make helm-release
+  openshift:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: run minishift
+          command: |
+            make minishift-run
+      - run:
+          name: run kafka tests
+          command: |
+            make openshift-test
+      - run:
+          name: delete minishift
+          command: |
+            openshift/main.sh clean
+
+workflows:
+  version: 2
+  build:
+    jobs:
+    - docker:
+        filters:
+          branches:
+            only: master
+    - k8s:
+        requires:
+        - docker
+        filters:
+          branches:
+            only: master
+    - helm:
+        requires:
+        - k8s
+        filters:
+          branches:
+            only: master
+    - openshift:
+        requires:
+        - docker
+        filters:
+          branches:
+            only: master

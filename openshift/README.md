@@ -2,10 +2,9 @@
 
 Kafka cluster deployment.
 
-The resources found here are templates for Openshift catalog.
+The resources here are templates for Openshift catalog.
 
-It isn't necessary to clone this repo, you can use the resources with the prefix "https://raw.githubusercontent.com/engapa/kafka-k8s-openshift/master/openshift/" in order to get remote sources directly.
-
+It isn't necessary to clone this repo, you can use the resources directly trough the URLs ("https://raw.githubusercontent.com/engapa/kafka-k8s-openshift/master/openshift/\<resource\>".
 
 ## Building the image
 
@@ -15,7 +14,7 @@ Anyway, if you prefer to build the image in your private Openshift registry just
 
 1 - Create an image builder and build the container image
 
-```sh
+```bash
 $ oc create -f buildconfig.yaml
 $ oc new-app kafka-builder -p IMAGE_STREAM_VERSION="2.12-2.0.0" -p GITHUB_REF="v2.12-1.1.0"
 ```
@@ -24,7 +23,7 @@ Explore the command `oc new-build` to create a builder via shell command client.
 
 2 - Check that image is ready to use
 
-```sh
+```bash
 $ oc get is -l component=zk [-n project]
 NAME    DOCKER REPO                       TAGS           UPDATED
 kafka   172.30.1.1:5000/myproject/kafka   2.12-2.0.0  1 days ago
@@ -34,7 +33,7 @@ kafka   172.30.1.1:5000/myproject/kafka   2.12-2.0.0  1 days ago
 
 4 - \[Optional\] Launch the builder again with another commit or whenever you want:
 
-```sh
+```bash
 $ oc start-build kafka-builder --commit=master
 ```
 

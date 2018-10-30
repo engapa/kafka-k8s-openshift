@@ -50,4 +50,6 @@ WORKDIR $KAFKA_HOME
 
 EXPOSE $SERVER_port
 
+HEALTHCHECK --interval=20s --retries=10 CMD "kafka_server_status.sh"
+
 CMD kafka_server.sh start
