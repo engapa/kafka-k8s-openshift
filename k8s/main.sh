@@ -50,7 +50,7 @@ function minikube-run()
   touch $HOME/.kube/config
 
   export KUBECONFIG=$HOME/.kube/config
-  sudo -E ./minikube start --vm-driver=none
+  sudo -E ./minikube start --vm-driver=none --memory 5000 --cpus 4
 
   # this for loop waits until kubectl can access the api server that Minikube has created
   for i in {1..150}; do # timeout for 5 minutes

@@ -45,7 +45,7 @@ function minishift-run()
   touch $HOME/.kube/config
 
   export KUBECONFIG=$HOME/.kube/config
-  sudo -E ./minishift start --vm-driver=none --memory 5000 --cpu 4
+  sudo -E ./minishift start --vm-driver=none --memory 5000 --cpus 4
 
   # Waiting for Minikube
   for i in {1..150}; do # timeout for 5 minutes
