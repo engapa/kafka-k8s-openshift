@@ -8,7 +8,7 @@
 
 This project is meant to create an optimised docker image to run kafka containers as 'statefulset' into kubernetes/openshift.
 
-# Build and publish a kafka image
+## Build and publish a kafka image
 
 To get a docker image ready with default values type:
 
@@ -36,7 +36,7 @@ The provided scripts are:
 * **kafka_server.sh** : A central script to manage kafka and optional zookeeper processes.
 * **kafka_server_status.sh** : Checks kafka server status.
 
-# Run a container
+## Run a container
 
 Default `CMD` runs a kafka server with a zookeeper subprocess.
 
@@ -151,7 +151,7 @@ $ docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_zookeeper_connect=zooke
 engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 ```
 
-# Kubernetes
+## Kubernetes
 
 In [k8s directory](k8s) there are some examples and utilities for Kubernetes
 
@@ -159,10 +159,10 @@ In [k8s directory](k8s) there are some examples and utilities for Kubernetes
 
 In [openshift directory](openshift) there are some resources for Openshift.
 
-#License
+## License
 
 [![License status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fengapas%2Fkafka-k8s-openshift?ref=badge_large)
 
-# Author
+## Author
 
 Enrique Garcia **engapa@gmail.com**
