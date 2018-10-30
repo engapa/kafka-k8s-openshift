@@ -155,7 +155,7 @@ engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 
 In [k8s directory](k8s) there are some examples and utilities for Kubernetes
 
-# Openshift
+## Openshift
 
 In [openshift directory](openshift) there are some resources for Openshift.
 
