@@ -8,8 +8,8 @@ It isn't necessary to clone this repo, you can use the resources directly trough
 
 ## Requirements
 
-- [oc](https://github.com/openshift/origin/releases) (openshift client, 3.10 \>=)
-- Openshift cluster (3.10 \>=)
+- [oc](https://github.com/openshift/origin/releases) (openshift client, 3.11 \>=)
+- Openshift cluster (v1.26.1 \>=)
 
 ### DEV environment
 

@@ -29,7 +29,7 @@ jobs:
         command: |
           make docker-push
           if [ "$CIRCLE_BRANCH" == "master" ]; then
-              docker build --no-cache -t ${DOCKER_USERNAME}/kafka:latest .;
+              docker build -t ${DOCKER_USERNAME}/kafka:latest .;
               docker push ${DOCKER_USERNAME}/kafka:latest;
           fi
   k8s:
@@ -38,15 +38,15 @@ jobs:
       - checkout
       - run:
           name: run minikube
-          command: make minikube-reqs minikube-run
+          command: make minikube minikube-run
       - run:
           name: run kafka tests
           command: |
-            make k8s-test
+            make minikube-test
       - run:
           name: delete minikube
           command: |
-            k8s/main.sh clean
+            make minikube-clean
   openshift:
     machine: true
     steps:
@@ -54,15 +54,15 @@ jobs:
       - run:
           name: run minishift
           command: |
-            make minishift-run
+            make minishift minishift-run
       - run:
           name: run kafka tests
           command: |
-            make openshift-test
+            make minishift-test
       - run:
           name: delete minishift
           command: |
-            openshift/main.sh clean
+            make minishift-clean
 
 workflows:
   version: 2

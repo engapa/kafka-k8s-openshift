@@ -42,30 +42,38 @@ docker-test: docker-run ## Test for docker container
 docker-push: ## Publish docker images
 	@docker push $(DOCKER_ORG)/$(DOCKER_IMAGE):$(SCALA_VERSION)-$(KAFKA_VERSION)
 
-.PHONY: minikube-reqs
-minikube-reqs: ## Install requisites of kubernetes (minikebe)
+.PHONY: minikube
+minikube-reqs: ## Install minikube and kubectl
 	@k8s/main.sh minikube
 	@k8s/main.sh kubectl
 
 .PHONY: minikube-run
-minikube-run: ## Run a kubernetes cluster (minikube)
+minikube-run: ## Run minikube
 	@k8s/main.sh minikube_run
 
 .PHONY: minikube-test
 minikube-test: ## Launch tests on minikube
 	@k8s/main.sh test-all
 
-.PHONY: minishift-reqs
-minishift-reqs: ## Install requisites of Openshift (minishift)
-	@k8s/main.sh minishift
-	@k8s/main.sh oc
+.PHONY: minikube-clean
+minikube-clean: ## Remove minikube
+	@k8s/main.sh clean
+
+.PHONY: minishift
+minishift: ## Install minishift and oc
+	@openshift/main.sh minishift
+	@openshift/main.sh oc
 
 .PHONY: minishift-run
-minishift-run: ## Launck an Openshift cluster (minishift)
-	@k8s/main.sh minikube-run
+minishift-run: ## Run minishift
+	@openshift/main.sh minikube-run
 
 .PHONY: minishift-test
 minishift-test: ## Launch tests on minishift
 	@openshift/main.sh test-all
+
+.PHONY: minishift-clean
+minishift-clean: ## Remove minishift
+	@openshift/main.sh clean
 
 ## TODO: helm, ksonnet

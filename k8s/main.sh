@@ -16,6 +16,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SLEEP_TIME=8
 MAX_ATTEMPTS=10
 
+DISTRO=$(uname -s | tr '[:upper:]' '[:lower:]')
+
 function kubectl()
 {
 
@@ -23,22 +25,18 @@ function kubectl()
     KUBE_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
   fi
 
-  # Download kubectl.
-  distro=$(uname -s | tr '[:upper:]' '[:lower:]')
-  curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBE_VERSION}/bin/$distro/amd64/kubectl
+  # Download kubectl
+  curl -L0 kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBE_VERSION}/bin/$DISTRO/amd64/kubectl
   chmod +x kubectl
 
-  ./kubectl version --client
 }
 
 function minikube()
 {
-  # Download minikube.
-  distro=$(uname -s | tr '[:upper:]' '[:lower:]')
-  curl -Lo minikube https://storage.googleapis.com/minikube/releases/${MINIKUBE_VERSION}/minikube-$distro-amd64
+  # Download minikube
+  curl -Lo minikube https://storage.googleapis.com/minikube/releases/${MINIKUBE_VERSION}/minikube-$DISTRO-amd64
   chmod +x minikube
 
-  ./minikube version
 }
 
 function minikube_run()
@@ -56,7 +54,7 @@ function minikube_run()
 
   # this for loop waits until kubectl can access the api server that Minikube has created
   for i in {1..150}; do # timeout for 5 minutes
-     ./kubectl get po &> /dev/null
+     ./kubectl version &> /dev/null
      if [ $? -ne 1 ]; then
         break
     fi
@@ -64,8 +62,7 @@ function minikube_run()
   done
 
   # Check kubernetes info
-  kubectl version
-  kubectl cluster-info
+  ./kubectl cluster-info
 }
 
 function conf()
@@ -80,8 +77,8 @@ function zk_install()
 {
 
   echo "Deploying zookeeper ..."
-  kubectl run zk --image $ZK_IMAGE --port 2181 --labels="component=kafka,app=zk"
-  kubectl expose deploy zk --name zk --port=2181 --cluster-ip=None --labels="component=kafka,app=zk"
+  ./kubectl run zk --image $ZK_IMAGE --port 2181 --labels="component=kafka,app=zk"
+  ./kubectl expose deploy zk --name zk --port=2181 --cluster-ip=None --labels="component=kafka,app=zk"
   echo "Zookeeper running on zk.default.svc.cluster.local"
   # TODO: Wait until kubectl get pods --field-selector=status.phase=Running
 
@@ -94,7 +91,7 @@ function check()
 
   attempts=0
   JSONPATH_STSETS='replicasOk={.items[?(@.kind=="StatefulSet")].status.readyReplicas}'
-  until [ "$(kubectl get -f $1 -o jsonpath="$JSONPATH_STSETS" 2>&1)" == "replicasOk=$2" ]; do
+  until [ "$(./kubectl get -f $1 -o jsonpath="$JSONPATH_STSETS" 2>&1)" == "replicasOk=$2" ]; do
     sleep $SLEEP_TIME
     attempts=`expr $attempts + 1`
     if [[ $attempts -gt $MAX_ATTEMPTS ]]; then
@@ -111,7 +108,7 @@ function test()
   file=$DIR/kafka.yaml
   conf $file
   # When
-  kubectl create -f $file
+  ./kubectl create -f $file
   # Then
   check $file 3
   # TODO: Use kafka client to validate e2e
@@ -123,7 +120,7 @@ function test-persistent()
   install_zk
   file=$DIR/kafka-persistent.yaml
   # When
-  kubectl create -f $file
+  ./kubectl create -f $file
   # Then
   check $file 3
 }
@@ -133,22 +130,22 @@ function test-zk-persistent()
   # Given
   file=$DIR/kafka-zk-persistent.yaml
   # When
-  kubectl create -f $file
+  ./kubectl create -f $file
   # Then
   check file 1
 }
 
 function test-all()
 {
-  test && kubectl delete --force=true -l component=kafka -l app=kafka all
-  test-persistent && kubectl delete --force=true -l component=kafka -l app=kafka all,pv,pvc
+  test && ./kubectl delete --force=true -l component=kafka -l app=kafka all
+  test-persistent && ./kubectl delete --force=true -l component=kafka -l app=kafka all,pv,pvc
   test-zk-persistent
 }
 
 function clean() # Destroy minikube vm
 {
   echo "Cleaning ...."
-  minikube delete
+  ./minikube delete
 }
 
 function help() # Show a list of functions
