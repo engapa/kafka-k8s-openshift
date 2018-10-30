@@ -3,7 +3,6 @@ jobs:
   docker:
     docker:
     - image: docker
-    tty: true
     steps:
     - setup_remote_docker:
         docker_layer_caching: true
@@ -32,37 +31,53 @@ jobs:
               docker build -t ${DOCKER_USERNAME}/kafka:latest .;
               docker push ${DOCKER_USERNAME}/kafka:latest;
           fi
-  k8s:
-    machine: true
-    steps:
-      - checkout
-      - run:
-          name: run minikube
-          command: make minikube minikube-run
-      - run:
-          name: run kafka tests
-          command: |
-            make minikube-test
-      - run:
-          name: delete minikube
-          command: |
-            make minikube-clean
-  openshift:
-    machine: true
-    steps:
-      - checkout
-      - run:
-          name: run minishift
-          command: |
-            make minishift minishift-run
-      - run:
-          name: run kafka tests
-          command: |
-            make minishift-test
-      - run:
-          name: delete minishift
-          command: |
-            make minishift-clean
+#  k8s:
+#    machine: true
+#    steps:
+#      - checkout
+#      - run:
+#          name: bootstrapping
+#          command: |
+#            sudo curl -L https://github.com/dhiltgen/docker-machine-kvm/releases/download/v0.7.0/docker-machine-driver-kvm -o /usr/local/bin/docker-machine-driver-kvm
+#            sudo chmod +x /usr/local/bin/docker-machine-driver-kvmminishift-run
+#            sudo apt install libvirt-bin qemu-kvm
+#            sudo usermod -a -G libvirtd circleci
+#            newgrp libvirtd
+#      - run:
+#          name: run minikube
+#          command: make minikube minikube-run
+#      - run:
+#          name: run kafka tests
+#          command: |
+#            make minikube-test
+#      - run:
+#          name: delete minikube
+#          command: |
+#            make minikube-clean
+#  openshift:
+#    machine: true
+#    steps:
+#      - checkout
+#      - run:
+#          name: bootstrapping
+#          command: |
+#            sudo curl -L https://github.com/dhiltgen/docker-machine-kvm/releases/download/v0.7.0/docker-machine-driver-kvm -o /usr/local/bin/docker-machine-driver-kvm
+#            sudo chmod +x /usr/local/bin/docker-machine-driver-kvmminishift-run
+#            sudo apt install libvirt-bin qemu-kvm
+#            sudo usermod -a -G libvirtd circleci
+#            newgrp libvirtd
+#      - run:
+#          name: run minishift
+#          command: |
+#            make minishift minishift-run
+#      - run:
+#          name: run kafka tests
+#          command: |
+#            make minishift-test
+#      - run:
+#          name: delete minishift
+#          command: |
+#            make minishift-clean
 
 workflows:
   version: 2
@@ -72,15 +87,15 @@ workflows:
         filters:
           branches:
             only: master
-    - k8s:
-        requires:
-        - docker
-        filters:
-          branches:
-            only: master
-    - openshift:
-        requires:
-        - docker
-        filters:
-          branches:
-            only: master
+#    - k8s:
+#        requires:
+#        - docker
+#        filters:
+#          branches:
+#            only: master
+#    - openshift:
+#        requires:
+#        - docker
+#        filters:
+#          branches:
+#            only: master
