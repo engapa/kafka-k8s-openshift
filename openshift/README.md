@@ -84,7 +84,7 @@ To build and save a docker image of kafka in your private Openshift registry jus
 
 ```bash
 $ oc create -f buildconfig.yaml
-$ oc new-app kafka-builder -p GITHUB_REF="v2.12-1.1.0" -p IMAGE_STREAM_VERSION="2.12-2.0.0"
+$ oc new-app kafka-builder -p GITHUB_REF="v2.12-2.0.0" -p IMAGE_STREAM_VERSION="2.12-2.0.0"
 ```
 If you want to get an image from another git commit:
 
