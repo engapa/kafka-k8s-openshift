@@ -43,7 +43,7 @@ jobs:
           name: run minikube
           command: make minikube-run
       - run:
-          name: run zookeeper tests
+          name: run tests
           command: make minikube-test
       - run:
           name: delete minikube
@@ -60,7 +60,7 @@ jobs:
         name: run local openshift cluster
         command: make oc-cluster-run
     - run:
-        name: run zookeeper tests
+        name: run tests
         command: make oc-cluster-test
     - run:
         name: delete local openshift cluster

@@ -51,7 +51,7 @@ function check()
   SLEEP_TIME=10
   MAX_ATTEMPTS=10
   ATTEMPTS=0
-  until [ "$(oc get statefulset -l zk-name=zk -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.currentReplicas}' 2>&1)" == "$2" ]; do
+  until [ "$(oc get statefulset -l app=kafka -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.currentReplicas}' 2>&1)" == "$2" ]; do
     sleep $SLEEP_TIME
     ATTEMPTS=`expr $ATTEMPTS + 1`
     if [[ $ATTEMPTS -gt $MAX_ATTEMPTS ]]; then
