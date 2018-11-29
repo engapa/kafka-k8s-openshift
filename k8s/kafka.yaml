@@ -40,7 +40,7 @@ spec:
       containers:
       - name: kafka
         imagePullPolicy: Always
-        image: engapa/kafka:2.12-2.0.0
+        image: engapa/kafka:2.12-2.1.0
         ports:
         - containerPort: 9092
           name: broker-port
