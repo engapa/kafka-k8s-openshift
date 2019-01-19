@@ -34,7 +34,7 @@ RUN set -x \
     && apk del gnupg
 
 # Add custom scripts and configure user
-ADD kafka_env.sh kafka_setup.sh kafka_server.sh kafka_server_status.sh $KAFKA_HOME/bin/
+ADD kafka_*.sh $KAFKA_HOME/bin/
 
 RUN set -x \
     && chmod a+x $KAFKA_HOME/bin/kafka_*.sh \

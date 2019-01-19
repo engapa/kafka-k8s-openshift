@@ -33,7 +33,7 @@ PREFIX=TOOLS_LOG4J_ DEST_FILE=${KAFKA_CONF_DIR}/tools-log4j.properties env_vars_
 
 #Local Zookeeper server
 if $KAFKA_ZK_LOCAL;then
-  if [[ "x$ZOO_HEAP_OPTS" != "x" ]]; then
+  if [[ "x${ZOO_HEAP_OPTS:-}" != "x" ]]; then
     sed -r -i 's/.*exec.*/export KAFKA_HEAP_OPTS=\"$ZOO_HEAP_OPTS\"\n&/' $KAFKA_HOME/bin/zookeeper-server-start.sh
   fi
 fi
