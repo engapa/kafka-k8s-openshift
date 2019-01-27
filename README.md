@@ -151,6 +151,25 @@ $ docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_zookeeper_connect=zooke
 engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 ```
 
+## Docker
+
+If you want to deploy a local kafka all-in-one container (one instance of zookeeper and another one of kafka server), for instance for testing or dev purposes in your laptop or workstation:
+
+```bash
+docker run -it -p 9092:9092 -e "SETUP_DEBUG=true" \
+  -e "SERVER_advertised_listeners=PLAINTEXT://localhost:9092" \
+  -e "SERVER_listener_security_protocol_map=PLAINTEXT:PLAINTEXT" \
+  -e "SERVER_listeners=PLAINTEXT://0.0.0.0:9092" \
+  -h kafka engapa/kafka
+```
+
+Now you can use the container as kafka server from code on your docker host.
+
+Another kafka containers can be found at:
+
+- https://hub.docker.com/r/spotify/kafka/
+- https://hub.docker.com/r/wurstmeister/kafka
+
 ## Kubernetes
 
 In [k8s directory](k8s) there are some examples and utilities for Kubernetes

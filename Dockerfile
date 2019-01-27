@@ -13,7 +13,8 @@ ENV KAFKA_HOME=${KAFKA_HOME} \
     SCALA_VERSION=${SCALA_VERSION} \
     KAFKA_ZK_LOCAL=true \
     KAFKA_REPLICAS=1 \
-    SERVER_port=9092
+    SERVER_port=9092 \
+    ZK_clientPort=2181
 
 # Required packages
 RUN set -x \
@@ -48,7 +49,7 @@ RUN set -x \
 USER $KAFKA_USER
 WORKDIR $KAFKA_HOME
 
-EXPOSE $SERVER_port
+EXPOSE $ZK_port $SERVER_port
 
 HEALTHCHECK --interval=20s --retries=10 CMD "kafka_server_status.sh"
 
