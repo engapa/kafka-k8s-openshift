@@ -49,7 +49,7 @@ function check()
 {
 
   SLEEP_TIME=10
-  MAX_ATTEMPTS=10
+  MAX_ATTEMPTS=20
   ATTEMPTS=0
   until [ "$(oc get statefulset -l app=kafka -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.currentReplicas}' 2>&1)" == "$2" ]; do
     sleep $SLEEP_TIME

@@ -68,7 +68,7 @@ function minikube-run()
 function check()
 {
   SLEEP_TIME=10
-  MAX_ATTEMPTS=10
+  MAX_ATTEMPTS=20
   ATTEMPTS=0
   JSONPATH_STSETS=
   until [ "$(kubectl get -f $1 -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.readyReplicas}' 2>&1)" == "$2" ]; do
