@@ -8,20 +8,22 @@
 
 This project is meant to create an optimised docker image to run kafka containers as 'statefulset' into kubernetes/openshift.
 
-## Build and publish a kafka image
+Obviously, the docker image can be used locally for testing or development purposes.
+
+## Build and publish a kafka docker image
 
 To get a docker image ready with default values type:
 
 ```bash
 $ make clean-all docker-build docker-test docker-push 
 ```
-To get a custom image:
+To get your own image:
 ```bash
 $ export KAFKA_HOME="/opt/kafka"
 $ export SCALA_VERSION="2.12"
 $ export KAFKA_VERSION="2.1.0"
 $ docker build --build-arg SCALA_VERSION=$SCALA_VERSION --build-arg KAFKA_VERSION=$KAFKA_VERSION --build-arg KAFKA_HOME=$KAFKA_HOME \
--t engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
+-t your-org/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 ```
 
 > NOTE: build-args are optional arguments if you want different values from default ones in the Dockerfile
@@ -36,14 +38,19 @@ The provided scripts are:
 * **kafka_server.sh** : A central script to manage kafka and optional zookeeper processes.
 * **kafka_server_status.sh** : Checks kafka server status.
 
-## Run a container
+Public docker images are available [HERE](https://cloud.docker.com/repository/docker/engapa/kafka/tags) 
 
-Default `CMD` runs a kafka server with a zookeeper subprocess.
+## Getting started with a single docker container locally
 
-The below example shows you how to run an all-in-one docker kafka container (with zookeeper as sidecar) :
+The example bellow shows you how to run an all-in-one docker kafka container (with zookeeper as internal sidecar):
 
 ```bash
-$ docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
+$ docker run -it -p 9092:9092 -p 2181:2181 \
+  -e "SETUP_DEBUG=true" \
+  -e "SERVER_advertised_listeners=PLAINTEXT://localhost:9092" \
+  -e "SERVER_listener_security_protocol_map=PLAINTEXT:PLAINTEXT" \
+  -e "SERVER_listeners=PLAINTEXT://0.0.0.0:9092" \
+  -h kafka engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 
 Writing environment variables to file :
 
@@ -88,7 +95,7 @@ LOWER            : false
 
 >NOTE: We've passed a SETUP_DEBUG environment variable (SETUP_DEBUG=true) to view the setup process details.
 
-## Setting up
+### Setting up
 
 Users can provide parameters to config files just adding environment variables with specific name patterns.
 
@@ -110,7 +117,7 @@ CONN_LOG4J_ | connect-log4j.properties | CONN_LOG4J_log4j_rootLogger=INFO, stdou
 CONN_STANDALONE_ | connect-standalone.properties | CONN_STANDALONE_bootstrap_servers=localhost:9092 --> bootstrap.servers=localhost:9092
 TOOLS_LOG4J_ | tools-log4j.properties | TOOLS_LOG4J_log4j_appender_stderr_Target=System.err --> log4j.appender.stderr.Target=System.err
 
-So we can configure our kafka server via environment variables :
+So we can configure our kafka server via environment variables directly:
 
 ```bash
 $ docker run -it -d -e "LOG4J_log4j_rootLogger=DEBUG, stdout" -e "SERVER_log_retention_hours=24"\
@@ -119,25 +126,27 @@ engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 
 Also you may use `--env-file` option to load these variables from a file.
 
-And, of course, you could provide your own property files directly by option `-v` and don't use `kafka_setup` and `kafka_server` scripts.
+And, of course, you could provide your own property files directly by option `-v` with the suitable properties files.
 
 The override option of kafka server is preserved and anybody can use it on this way:
 
 ```bash
-$ docker run -it -e "SETUP_DEBUG=true" engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} \
- /bin/bash -c "kafka_server.sh start --override advertised.host.name=blablabla"
+$ docker run -it \
+  -e "SETUP_DEBUG=true" \
+  -h kafka engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION} \
+ /bin/bash -c "kafka_server.sh start --override advertised.host.name=kafka"
  [2017-02-04 19:06:10,504] INFO KafkaConfig values:
-	advertised.host.name = blablabla
+	advertised.host.name = kafka
 ...
 [2017-02-04 19:06:11,693] INFO [Kafka Server 1001], started (kafka.server.KafkaServer)
 ```
 
-### Run local zookeeper
+#### Run local zookeeper
 
-By default, when someone launches  `kafka_server.sh start` a zookeeper process is started too.
+By default a zookeeper process is started too, as we said previously.
 This behaviour is managed by the env variable KAFKA_ZK_LOCAL (defaults to true).
 
-### External zookeeper
+#### External zookeeper
 
 If you want to deploy a kafka server w/o local zookeeper then you should provide these env values:
 
@@ -147,28 +156,11 @@ If you want to deploy a kafka server w/o local zookeeper then you should provide
 For instance:
 
 ```bash
-$ docker run -it -d -e "KAFKA_ZK_LOCAL=false" -e "SERVER_zookeeper_connect=zookeeperserver1:2181,zookeeperserver2:2181,zookeeperserver3:2181" \
-engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
+$ docker run -it \
+  -e "KAFKA_ZK_LOCAL=false" \
+  -e "SERVER_zookeeper_connect=zookeeperserver1:2181,zookeeperserver2:2181,zookeeperserver3:2181" \
+  engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}
 ```
-
-## Docker
-
-If you want to deploy a local kafka all-in-one container (one instance of zookeeper and another one of kafka server), for instance for testing or dev purposes in your laptop or workstation:
-
-```bash
-docker run -it -p 9092:9092 -e "SETUP_DEBUG=true" \
-  -e "SERVER_advertised_listeners=PLAINTEXT://localhost:9092" \
-  -e "SERVER_listener_security_protocol_map=PLAINTEXT:PLAINTEXT" \
-  -e "SERVER_listeners=PLAINTEXT://0.0.0.0:9092" \
-  -h kafka engapa/kafka
-```
-
-Now you can use the container as kafka server from code on your docker host.
-
-Another kafka containers can be found at:
-
-- https://hub.docker.com/r/spotify/kafka/
-- https://hub.docker.com/r/wurstmeister/kafka
 
 ## Kubernetes
 
@@ -181,6 +173,13 @@ In [openshift directory](openshift) there are some resources for Openshift.
 ## License
 
 [![License status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fengapas%2Fkafka-k8s-openshift?ref=badge_large)
+
+## Extra Dockers
+
+Another great kafka docker images can be found at:
+
+- https://hub.docker.com/r/spotify/kafka/
+- https://hub.docker.com/r/wurstmeister/kafka
 
 ## Author
 
