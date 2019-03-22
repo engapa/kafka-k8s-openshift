@@ -4,7 +4,7 @@ DOCKER_ORG           ?= engapa
 DOCKER_IMAGE         ?= kafka
 
 SCALA_VERSION        ?= 2.12
-KAFKA_VERSION        ?= 2.1.0
+KAFKA_VERSION        ?= 2.1.1
 ZOO_VERSION          ?= 3.4.13
 
 KUBE_VERSION         ?= v1.11.3

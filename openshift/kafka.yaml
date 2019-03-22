@@ -18,7 +18,7 @@ parameters:
 - name: KAFKA_VERSION
   description: Kafka Version (Scala and kafka version).
   required: true
-  value: "2.12-2.1.0"
+  value: "2.12-2.1.1"
 - name: SOURCE_IMAGE
   description: Container image source.
   value: kafka
