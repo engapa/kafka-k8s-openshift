@@ -8,8 +8,8 @@ It isn't necessary to clone this repo, you can use the resources directly trough
 
 ## Requirements
 
-- [oc](https://github.com/openshift/origin/releases) (openshift client, 3.11 \>=)
-- Openshift cluster (v1.26.1 \>=)
+- [oc](https://github.com/openshift/origin/releases) (v3.11)
+- [minihift](https://github.com/minishift/minishift) (v1.33.0)
 
 ### DEV environment
 
@@ -19,12 +19,9 @@ We'll use only opensource, that's 'openshift origin'.
 After install the command client check everything is alright to continue:
 
 ```bash
-[$ minishift update]
 $ minishift version
-minishift v1.26.1+1e20f27
+minishift v1.33.0+ba29431
 $ minishift start [options]
-...
-Version: v3.11.0
 ...
 $ minishift openshift version
 openshift v3.11.0+57f8760-31
@@ -58,7 +55,6 @@ You may use the Openshift dashboard (`minishift console`) if you prefer to do th
 > TRICK: Login as cluster admin: `oc login -u system:admin -n default`,
  change permissions of default scc `oc edit scc restricted` and change runAsUser.type value to RunAsAny.
  
-
 For local environment we'll use a non persistent deployments (kafka.yaml)
 
 ### PROD environment

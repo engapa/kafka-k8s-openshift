@@ -144,11 +144,11 @@ $ docker run -it \
 #### Run local zookeeper
 
 By default a zookeeper process is started too, as we said previously.
-This behaviour is managed by the env variable KAFKA_ZK_LOCAL (defaults to true).
+This behaviour is managed by the env variable KAFKA_ZK_LOCAL (defaults to "true").
 
 #### External zookeeper
 
-If you want to deploy a kafka server w/o local zookeeper then you should provide these env values:
+If you want to deploy a kafka server without a local zookeeper then you should provide these env values:
 
 * KAFKA_ZK_LOCAL=false
 * SERVER_zookeeper_connect=\<zookeeper_host:zookeeper_port\>\[,\<zookeeper_host:zookeeper_port\>\]

@@ -2,8 +2,8 @@
 
 set -e
 
-MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v0.30.0"}
-KUBE_VERSION=${KUBE_VERSION:-"v1.10.0"}
+MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v0.35.0"}
+KUBE_VERSION=${KUBE_VERSION:-"v1.13.0"}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -89,7 +89,7 @@ function test()
   # When
   kubectl create -f $file
   # Then
-  check $file 1
+  check $file 3
 
 }
 
