@@ -67,7 +67,7 @@ We recommend you to use zookeeper template **zk-persistent.yaml** at https://git
 
 This means that although pods are destroyed all data are safe under persistent volumes, and when pod are recreated the volumes will be attached again.
 
-The statefulset objects have an "antiaffinity" pod scheduler policy so pods will be allocated in separate nodes.
+The statefulset objects have an "antiaffinity" pod scheduler policy so pods will be allocated on separated nodes.
 It's required the same number of nodes that the max value of parameter `ZOO_REPLICAS` or `KAFKA_REPLICAS`.
 
 ## Building the image
@@ -88,7 +88,7 @@ If you want to get an image from another git commit:
 $ oc start-build kafka-builder --commit=master
 ```
 
-2 - Check that image is ready to use
+2 - Check that image is ready:
 
 ```bash
 $ oc get is -l component=zk [-n project]

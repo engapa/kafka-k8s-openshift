@@ -68,7 +68,7 @@ $ minikube dashboard
 
 To remove all resources related to one kafka cluster deployment launch this command:
 
-```sh
+```bash
 $ kubectl delete all,statefulset[,pvc] -l app=<name> [-n <namespace>|--all-namespaces]
 ```
 where '<name>' is the value of param NAME. Note that pvc resources are marked as optional in the command,
@@ -78,18 +78,18 @@ Type the namespace option if you are in a different namespace that resources are
 It's possible delete all resources created by using the template:
 with cluster created by template name:
 
-```sh
+```bash
 $ kubectl delete all,statefulset[,pvc] -l template=kafka[-zk][-persistent] [-n <namespace>] [--all-namespaces]
 ```
 
 Also someone can remove all resources of type kafka, belong to all clusters and templates:
 
-```sh
+```bash
 $ kubectl delete all,statefulset[,pvc] -l component=kafka [-n <namespace>] [--all-namespaces]
 ```
 
 And finally if you even want to remove the template:
 
-```sh
+```bash
 $ kubectl delete template kafka[-zk][-persistent] [-n <namespace>] [--all-namespaces]
 ```
