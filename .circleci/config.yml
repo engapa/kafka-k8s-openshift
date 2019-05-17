@@ -31,6 +31,7 @@ jobs:
               docker build -t ${DOCKER_USERNAME}/kafka:latest .;
               docker push ${DOCKER_USERNAME}/kafka:latest;
           fi
+
   k8s:
     machine:
       image: circleci/classic:201808-01
@@ -44,10 +45,14 @@ jobs:
           command: make minikube-run
       - run:
           name: run tests
-          command: make minikube-test
+          command: make minikube-test-zk
       - run:
-          name: delete minikube
-          command: make minikube-clean
+          name: clean resources
+          command: make minikube-clean-resources
+      - run:
+          name: run tests with persistent storage
+          command: make minikube-test-persistent
+
   openshift:
     machine:
       image: circleci/classic:201808-01
@@ -61,10 +66,10 @@ jobs:
         command: make oc-cluster-run
     - run:
         name: run tests
-        command: make oc-cluster-test
+        command: make oc-test-zk
     - run:
-        name: delete local openshift cluster
-        command: make oc-cluster-clean
+        name: clean resources
+        command: make oc-clean-resources
 
 workflows:
   version: 2
@@ -82,7 +87,7 @@ workflows:
             only: master
     - openshift:
         requires:
-        - docker
+        - k8s
         filters:
           branches:
             only: master
