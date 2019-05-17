@@ -31,10 +31,20 @@ PREFIX=CONN_STANDALONE_ DEST_FILE=${KAFKA_CONF_DIR}/connect-standalone.propertie
 # Tools log4j
 PREFIX=TOOLS_LOG4J_ DEST_FILE=${KAFKA_CONF_DIR}/tools-log4j.properties env_vars_in_file
 
-#Local Zookeeper server
+# Local Zookeeper server
 if $KAFKA_ZK_LOCAL;then
   if [[ "x${ZOO_HEAP_OPTS:-}" != "x" ]]; then
     sed -r -i 's/.*exec.*/export KAFKA_HEAP_OPTS=\"$ZOO_HEAP_OPTS\"\n&/' $KAFKA_HOME/bin/zookeeper-server-start.sh
   fi
 fi
 
+# Ensure permission on possible mount volumes
+for dir in $KAFKA_DATA_DIR $KAFKA_HOME/zookeeper; do
+  if [[ ! -d $dir ]]; then
+    echo "Creating directory $dir ..."
+    mkdir -p $dir
+  else
+    echo "Ensuring permission for directory $dir ..."
+    sudo chown -R $KAFKA_USER:$KAFKA_GROUP $dir
+  fi
+done
