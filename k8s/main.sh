@@ -2,8 +2,8 @@
 
 set -e
 
-MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v1.0.0"}
-KUBE_VERSION=${KUBE_VERSION:-"v1.14.0"}
+MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v1.0.1"}
+KUBE_VERSION=${KUBE_VERSION:-"v1.14.1"}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -43,7 +43,7 @@ function minikube-run()
   export CHANGE_MINIKUBE_NONE_USER=true
   export KUBECONFIG=$HOME/.kube/config
 
-  sudo -E minikube start --vm-driver=none --cpus 2 --memory 2048 --kubernetes-version=${KUBE_VERSION}
+  sudo -E minikube start --vm-driver=none --cpus 2 --memory 3062 --kubernetes-version=${KUBE_VERSION}
 
   # this for loop waits until kubectl can access the api server that Minikube has created
   for i in {1..150}; do # timeout for 5 minutes
@@ -69,23 +69,25 @@ function check()
   SLEEP_TIME=10
   MAX_ATTEMPTS=50
   ATTEMPTS=0
-  JSONPATH_STSETS=
-  until [[ "$(kubectl get -f $1 -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.readyReplicas}' 2>&1)" == "$2" ]]; do
+  READY_REPLICAS="0"
+  REPLICAS=${2:-1}
+  until [[ "$READY_REPLICAS" == "$REPLICAS" ]]; do
     sleep $SLEEP_TIME
     ATTEMPTS=`expr $ATTEMPTS + 1`
     if [[ $ATTEMPTS -gt $MAX_ATTEMPTS ]]; then
       echo "ERROR: Max number of attempts was reached (${MAX_ATTEMPTS})"
       exit 1
     fi
-   echo "Retry [${ATTEMPTS}/${MAX_ATTEMPTS}] ... "
+   READY_REPLICAS=$(kubectl get -f $1 -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.readyReplicas}' 2>&1)
+   echo "[${ATTEMPTS}/${MAX_ATTEMPTS}] - Ready replicas : ${READY_REPLICAS:-0}/$REPLICAS ... "
   done
   kubectl get all
 }
 
-function test()
+function test-zk()
 {
   # Given
-  file=$DIR/kafka.yaml
+  file=$DIR/kafka-zk.yaml
   # When
   kubectl create -f $file
   # Then
@@ -96,8 +98,16 @@ function test()
 function test-persistent()
 {
   # Given
+  # A zookeeper cluster is deployed previously with three replicas
+  echo "Deploying zookeeper cluster with persistent storage ..."
+  file_zk=$DIR/.zk-persistent.yaml
+  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v3.4.14/k8s/zk-persistent.yaml
+  kubectl create -f $file_zk
+  check $file_zk 3
+
   file=$DIR/kafka-persistent.yaml
   # When
+   echo "Deploying kafka cluster with persistent storage ..."
   kubectl create -f $file
   # Then
   check $file 3
@@ -105,16 +115,29 @@ function test-persistent()
   kubectl get pvc,pv
 }
 
-function test-all()
+function test-zk-persistent()
 {
-  test && kubectl delete -l component=kafka all
-  test-persistent && kubectl delete -l component=kafka all,pv,pvc
+  # Given
+  file=$DIR/kafka-zk-persistent.yaml
+  # When
+  kubectl create -f $file
+  # Then
+  check $file 1
+
+  kubectl get pvc,pv
 }
 
-function clean-all()
+function test-all()
+{
+  test && kubectl delete -l component=kafka all && delete -l component=zk all
+  test-persistent && kubectl delete -l component=kafka all,pv,pvc && kubectl delete -l component=zk all,pv,pvc
+}
+
+function clean-resources()
 {
   echo "Cleaning resources ...."
   kubectl delete -l component=kafka all,pv,pvc
+  kubectl delete -l component=zk all,pv,pvc
 }
 
 function minikube-delete(){

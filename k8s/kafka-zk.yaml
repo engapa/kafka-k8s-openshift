@@ -3,7 +3,6 @@ kind: Service
 metadata:
   name: kafka
   labels:
-    app: kafka
     component: kafka
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
@@ -20,6 +19,7 @@ spec:
   clusterIP: None
   selector:
     app: kafka
+    component: kafka
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
@@ -31,16 +31,27 @@ metadata:
 spec:
   serviceName: kafka
   replicas: 3
+  podManagementPolicy: "Parallel"
   template:
     metadata:
       labels:
         app: kafka
         component: kafka
     spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
       containers:
       - name: kafka
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: engapa/kafka:2.12-2.2.0
+        resources:
+          requests:
+            memory: 1024M
+            cpu: 750m
+          limits:
+            memory: 1025M
+            cpu: 750m
         ports:
         - containerPort: 9092
           name: broker-port
@@ -55,6 +66,10 @@ spec:
           value: "3"
         - name:  KAFKA_ZK_LOCAL
           value: "true"
+        - name:  ZOO_HEAP_OPTS
+          value: "-Xmx512M -Xms512M"
+        - name:  KAFKA_HEAP_OPTS
+          value: "-Xmx512M -Xms512M"
         - name:  SERVER_zookeeper_connection
           value: "localhost:2181"
         - name:  SERVER_zookeeper_connection_timeout_ms
@@ -63,5 +78,11 @@ spec:
           exec:
             command:
             - kafka_server_status.sh
-          initialDelaySeconds: 15
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+              - kafka_server_status.sh
+          initialDelaySeconds: 30
           timeoutSeconds: 5

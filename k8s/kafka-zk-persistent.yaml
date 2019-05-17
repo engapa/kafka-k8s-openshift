@@ -57,17 +57,20 @@ spec:
 #            }
 #          }
     spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
       containers:
       - name: kafka
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         image: engapa/kafka:2.12-2.2.0
         resources:
           requests:
-            memory: 2Gi
-            cpu: 1
+            memory: 1024M
+            cpu: 750m
           limits:
-            memory: 2Gi
-            cpu: 2
+            memory: 1024M
+            cpu: 750m
         ports:
         - containerPort: 9092
           name: server
@@ -78,18 +81,14 @@ spec:
         - containerPort: 3888
           name: zkleader
         env:
-        - name:  KAFKA_VERSION
-          value: "2.2.0"
-        - name:  SCALA_VERSION
-          value: "2.12"
         - name : KAFKA_REPLICAS
-          value: "1"
+          value: "3"
         - name:  KAFKA_ZK_LOCAL
           value: "true"
         - name : ZOO_HEAP_OPTS
           value: "-Xmx512M -Xms512M"
         - name:  KAFKA_HEAP_OPTS
-          value: "-Xmx1448M -Xms1448M"
+          value: "-Xmx512M -Xms512M"
         - name:  SERVER_num_partitions
           value: "1"
         - name:  SERVER_delete_topic_enable
@@ -103,17 +102,17 @@ spec:
         - name:  SERVER_zookeeper_connection_timeout_ms
           value: "30000"
         # TODO: Resolve HostNotFound exception of zookeeper servers while kafka is starting up
-        #readinessProbe:
-        #  exec:
-        #    command:
-        #    - kafka_server_status.sh
-        #  initialDelaySeconds: 15
-        #  timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - kafka_server_status.sh
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
         livenessProbe:
           exec:
             command:
             - kafka_server_status.sh
-          initialDelaySeconds: 20
+          initialDelaySeconds: 30
           timeoutSeconds: 5
         volumeMounts:
         - name: kafka-data
@@ -125,31 +124,22 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: kafka-data
-      labels:
-        app: kafka
-        component: kafka
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Mi
+          storage: 1Gi
   - metadata:
       name: zk-data
-      labels:
-        app: kafka
-        component: kafka
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Mi
+          storage: 1Gi
   - metadata:
       name: zk-datalog
-      labels:
-        app: kafka
-        component: kafka
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Mi
+          storage: 1Gi

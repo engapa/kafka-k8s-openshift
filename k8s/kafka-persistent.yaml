@@ -47,21 +47,29 @@ metadata:
 #            }
 #          }
 spec:
-  selector:
-    matchLabels:
-      app: kafka
   serviceName: kafka
-  replicas: 1
+  replicas: 3
+  podManagementPolicy: "Parallel"
   template:
     metadata:
       labels:
         app: kafka
         component: kafka
     spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
       containers:
       - name: kafka
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: engapa/kafka:2.12-2.2.0
+        resources:
+          requests:
+            memory: 512M
+            cpu: 500m
+          limits:
+            memory: 512M
+            cpu: 500m
         ports:
         - containerPort: 9092
           name: broker-port
@@ -81,7 +89,7 @@ spec:
         - name:  KAFKA_ZK_LOCAL
           value: "false"
         - name:  KAFKA_HEAP_OPTS
-          value: "-Xmx1448M -Xms1448M"
+          value: "-Xmx512M -Xms512M"
         - name:  SERVER_num_partitions
           value: "1"
         - name:  SERVER_delete_topic_enable
@@ -89,7 +97,7 @@ spec:
         - name:  SERVER_log_retention_hours
           value: "2147483647"
         - name:  SERVER_zookeeper_connect
-          value: "zk.default.svc.cluster.local:2181"
+          value: "zk-svc.default.svc.cluster.local:2181"
         - name:  SERVER_log_dirs
           value: "/opt/kafka/data/logs"
         - name:  SERVER_zookeeper_connection_timeout_ms
@@ -100,21 +108,20 @@ spec:
             - kafka_server_status.sh
           initialDelaySeconds: 30
           timeoutSeconds: 15
+        readinessProbe:
+          exec:
+            command:
+            - kafka_server_status.sh
+          initialDelaySeconds: 30
+          timeoutSeconds: 15
         volumeMounts:
         - name: data
           mountPath: /opt/kafka/data
-        securityContext:
-          privileged: true
   volumeClaimTemplates:
   - metadata:
       name: data
-      labels:
-        app: kafka
-        component: kafka
-      annotations:
-        volume.beta.kubernetes.io/storage-class: standard
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 80Mi
+          storage: 1Gi
