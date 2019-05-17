@@ -34,7 +34,7 @@ parameters:
 - name: KAFKA_HEAP_OPTS
   description: Kafka JVM Heap options. Consider value of params RESOURCE_MEMORY_REQ, RESOURCE_MEMORY_LIMIT and ZK_HEAP_OPTS.
   required: true
-  value: "-Xmx1448M -Xms1448M"
+  value: "-Xmx512M -Xms512M"
 - name: SERVER_NUM_PARTITIONS
   description: >
     The default number of log partitions per topic.
@@ -71,20 +71,16 @@ parameters:
   required: true
 - name: RESOURCE_MEMORY_REQ
   description: The memory resource request.
-  value: "2Gi"
+  value: "1024M"
 - name: RESOURCE_MEMORY_LIMIT
   description: The limits for memory resource.
-  value: "2Gi"
+  value: "1025M"
 - name: RESOURCE_CPU_REQ
   description: The CPU resource request.
-  value: "1"
+  value: "750m"
 - name: RESOURCE_CPU_LIMIT
   description: The limits for CPU resource.
-  value: "2"
-- name: LP_INITIAL_DELAY
-  description: >
-    LivenessProbe initial delay in seconds.
-  value: "30"
+  value: "750m"
 
 objects:
 - apiVersion: v1
@@ -92,7 +88,7 @@ objects:
   metadata:
     name: ${NAME}
     labels:
-      app: ${NAME}
+      component: ${NAME}
     annotations:
       service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   spec:
@@ -107,13 +103,14 @@ objects:
       name: zkleader
     clusterIP: None
     selector:
-      app: ${NAME}
+      component: ${NAME}
 - apiVersion: apps/v1beta1
   kind: StatefulSet
   metadata:
     name: ${NAME}
     labels:
       app: ${NAME}
+      component: ${NAME}
   spec:
     podManagementPolicy: "Parallel"
     serviceName: ${NAME}
@@ -125,6 +122,9 @@ objects:
           template: kafka
           component: kafka
       spec:
+        securityContext:
+          runAsUser: 1001
+          fsGroup: 1001
         containers:
         - name: ${NAME}
           imagePullPolicy: IfNotPresent
@@ -164,9 +164,15 @@ objects:
             value: ${SERVER_ZOOKEEPER_CONNECT}
           - name:  SERVER_zookeeper_connection_timeout_ms
             value: ${SERVER_ZOOKEEPER_CONNECT_TIMEOUT}
+          readinessProbe:
+            exec:
+              command:
+              - kafka_server_status.sh
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
           livenessProbe:
             exec:
               command:
               - kafka_server_status.sh
-            initialDelaySeconds: ${LP_INITIAL_DELAY}
+            initialDelaySeconds: 30
             timeoutSeconds: 5

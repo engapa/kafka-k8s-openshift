@@ -198,6 +198,9 @@ objects:
               - kafka_server_status.sh
             initialDelaySeconds: ${LP_INITIAL_DELAY}
             timeoutSeconds: 5
+          securityContext:
+            runAsUser: 1001
+            fsGroup: 1001
           volumeMounts:
           - name: kafka-data
             mountPath: /opt/kafka/data

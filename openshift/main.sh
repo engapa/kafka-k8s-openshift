@@ -5,9 +5,10 @@ set -e
 SCALA_VERSION=${SCALA_VERSION:-"2.12"}
 KAFKA_VERSION=${KAFKA_VERSION:-"2.2.0"}
 KAFKA_IMAGE=${KAFKA_IMAGE:-"engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}"}
-ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION:-'3.4.13'}"
+ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION:-'3.4.14'}"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 
 function oc-install()
 {
@@ -19,6 +20,7 @@ function oc-install()
   chmod a+x oc
   sudo mv oc /usr/local/bin/oc
 }
+
 function oc-cluster-run()
 {
 
@@ -33,14 +35,24 @@ function oc-cluster-run()
   # Waiting for cluster
   for i in {1..150}; do # timeout for 5 minutes
      oc cluster status &> /dev/null
-     if [ $? -ne 1 ]; then
+     if [[ $? -ne 1 ]]; then
         break
     fi
     sleep 2
   done
 
-  oc create -f $DIR/kafka.yaml
+  oc login -u system:admin
+  oc adm policy add-scc-to-group privileged system:serviceaccounts:myproject
+  oc create -f $DIR/kafka-zk.yaml
   oc create -f $DIR/kafka-persistent.yaml
+
+}
+
+function build_local_image()
+{
+
+  oc new-build --name kafka --strategy docker --binary --docker-image "openjdk:8-jre-alpine"
+  oc start-build kafka --from-dir $DIR/.. --follow
 
 }
 
@@ -49,26 +61,29 @@ function check()
 {
 
   SLEEP_TIME=10
-  MAX_ATTEMPTS=20
+  MAX_ATTEMPTS=50
   ATTEMPTS=0
-  until [ "$(oc get statefulset -l app=kafka -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.currentReplicas}' 2>&1)" == "$1" ]; do
+  READY_REPLICAS="0"
+  REPLICAS=${1:-1}
+  until [[ "$READY_REPLICAS" == "$REPLICAS" ]]; do
     sleep $SLEEP_TIME
     ATTEMPTS=`expr $ATTEMPTS + 1`
     if [[ $ATTEMPTS -gt $MAX_ATTEMPTS ]]; then
       echo "ERROR: Max number of attempts was reached (${MAX_ATTEMPTS})"
       exit 1
     fi
-   echo "Retry [${ATTEMPTS}] ... "
+    READY_REPLICAS=$(oc get statefulset -l component=${2:-kafka} -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.readyReplicas}' 2>&1)
+   echo "[${ATTEMPTS}/${MAX_ATTEMPTS}] - Ready replicas : ${READY_REPLICAS:-0}/$REPLICAS ... "
   done
+  oc get all
 }
 
-
-function test()
+function test-zk()
 {
   # Given
-  REPLICAS=1
+  REPLICAS=${1:-1}
   # When
-  oc new-app kafka -p REPLICAS=$REPLICAS
+  oc new-app --template=kafka -p REPLICAS=$REPLICAS -p SOURCE_IMAGE="engapa/kafka"
   # Then
   check $REPLICAS
 
@@ -77,21 +92,57 @@ function test()
 function test-persistent()
 {
   # Given
+  echo "Installing zookeeper cluster ..."
+  file_zk=$DIR/.zk.yaml
+  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v3.4.14/openshift/zk.yaml
+  oc create -f $file_zk
+  oc new-app --template=zk -p ZOO_REPLICAS=3 -p SOURCE_IMAGE="engapa/zookeeper"
+  check 3 zk
+
+  echo "Installing kafka cluster with persistent storage ..."
+  REPLICAS=${1:-1}
+  for i in $(seq 1 ${REPLICAS});do
+  cat << PV | oc create -f -
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: kafka-persistent-data-disk-$i
+ contents: data
+ labels:
+   component: kafka
+spec:
+ capacity:
+  storage: 1Gi
+ accessModes:
+  - ReadWriteOnce
+ hostPath:
+  path: /tmp/oc/kafka-persistent-data-disk-$i
+PV
+  done
   # When
-  oc new-app kafka-persistent -p REPLICAS=3
+  oc new-app --template=kafka-persistent -p REPLICAS=${REPLICAS} -p SOURCE_IMAGE="engapa/kafka"
   # Then
-  check 3
+  check ${REPLICAS}
+  oc get pv,pvc
 }
 
 function test-all()
 {
-  test && oc delete -l component=kafka -l app=kafka all,pv,pvc,statefulset
-  test-persistent && oc delete -l component=kafka -l app=kafka all,pv,pvc,statefulset
+  REPLICAS=$1
+  test $REPLICAS && oc delete -l component=kafka all
+  test-persistent $REPLICAS && oc delete -l component=kafka all,pv,pvc
 }
 
-function oc-cluster-clean()
+function clean-resources()
 {
-  echo "Cleaning ...."
+  echo "Cleaning resources ...."
+  oc delete -l component=kafka all,pv,pvc
+  oc delete -l component=zk all,pv,pvc
+}
+
+function oc-cluster-delete()
+{
+  echo "Stopping cluster ...."
   oc cluster down
 }
 
@@ -100,7 +151,7 @@ function help() # Show a list of functions
     declare -F -p | cut -d " " -f 3
 }
 
-if [ "_$1" = "_" ]; then
+if [[ "_$1" = "_" ]]; then
     help
 else
     "$@"

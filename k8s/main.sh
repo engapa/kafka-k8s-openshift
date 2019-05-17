@@ -99,9 +99,9 @@ function test-persistent()
 {
   # Given
   # A zookeeper cluster is deployed previously with three replicas
-  echo "Deploying zookeeper cluster with persistent storage ..."
-  file_zk=$DIR/.zk-persistent.yaml
-  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v3.4.14/k8s/zk-persistent.yaml
+  echo "Deploying zookeeper cluster ..."
+  file_zk=$DIR/.zk.yaml
+  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v3.4.14/k8s/zk.yaml
   kubectl create -f $file_zk
   check $file_zk 3
 
