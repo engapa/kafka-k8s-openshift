@@ -70,6 +70,9 @@ jobs:
     - run:
         name: clean resources
         command: make oc-clean-resources
+    - run:
+        name: run tests with persistent storage
+        command: make oc-test-persistent
 
 workflows:
   version: 2

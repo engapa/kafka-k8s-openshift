@@ -52,7 +52,7 @@ parameters:
 - name: SERVER_ZOOKEEPER_CONNECT
   description: >
     Zookeeper conection string, a list as URL with nodes separated by ','.
-  value: "zk-svc.default.svc.cluster.local:2181"
+  value: "zk.myproject.svc.cluster.local:2181"
   required: true
 - name: SERVER_ZOOKEEPER_CONNECT_TIMEOUT
   description: >
