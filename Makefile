@@ -5,13 +5,8 @@ DOCKER_IMAGE         ?= kafka
 
 SCALA_VERSION        ?= 2.12
 KAFKA_VERSION        ?= 2.2.0
-ZOO_VERSION          ?= 3.4.13
+ZOO_VERSION          ?= 3.4.14
 
-KUBE_VERSION         ?= v1.11.3
-MINIKUBE_VERSION     ?= v0.30.0
-
-OC_VERSION           ?= v3.11.0
-MINISHIFT_VERSION    ?= v1.26.1
 
 .PHONY: help
 help: ## Show this help
@@ -52,13 +47,21 @@ minikube-install: ## Install minikube and kubectl
 minikube-run: ## Run minikube
 	@k8s/main.sh minikube-run
 
-.PHONY: minikube-test
-minikube-test: ## Launch tests on minikube
-	@k8s/main.sh test
+.PHONY: minikube-test-zk
+minikube-test-zk: ## Launch tests on minikube, within an internal zookeeper cluster
+	@k8s/main.sh test-zk
 
-.PHONY: minikube-clean
-minikube-clean: ## Remove minikube
-	@k8s/main.sh clean
+.PHONY: minikube-test-persistent
+minikube-test-persistent: ## Launch tests on minikube, within an external zookeeper cluster
+	@k8s/main.sh test-persistent
+
+.PHONY: minikube-clean-resources
+minikube-clean-resources: ## Clean kafka and zookeeper respources
+	@k8s/main.sh clean-resources
+
+.PHONY: minikube-delete
+minikube-delete: ## Remove minikube
+	@k8s/main.sh minikube-delete
 
 .PHONY: oc-install
 oc-install: ## Install oc tools
@@ -68,12 +71,16 @@ oc-install: ## Install oc tools
 oc-cluster-run: ## Run a cluster through oc command
 	@openshift/main.sh oc-cluster-run
 
-.PHONY: oc-cluster-test
-oc-cluster-test: ## Launch tests on our local openshift cluster
-	@openshift/main.sh test
+.PHONY: oc-test-zk
+oc-test-zk: ## Launch tests on openshift, within an internal zookeeper cluster
+	@openshift/main.sh test-zk
 
-.PHONY: oc-cluster-clean
+.PHONY: oc-test-persistent
+oc-test-persistent: ## Launch tests on openshift, within an external zookeeper cluster
+	@openshift/main.sh test-persistent
+
+.PHONY: oc-cluster-delete
 oc-cluster-clean: ## Remove openshift cluster
-	@openshift/main.sh oc-cluster-clean
+	@openshift/main.sh oc-cluster-delete
 
 ## TODO: helm, ksonnet for deploy on kubernetes
