@@ -75,6 +75,10 @@ oc-cluster-run: ## Run a cluster through oc command
 oc-test-zk: ## Launch tests on openshift, within an internal zookeeper cluster
 	@openshift/main.sh test-zk
 
+.PHONY: oc-clean-resources
+oc-clean-resources: ## Clean kafka and zookeeper respources
+	@openshift/main.sh clean-resources
+
 .PHONY: oc-test-persistent
 oc-test-persistent: ## Launch tests on openshift, within an external zookeeper cluster
 	@openshift/main.sh test-persistent
