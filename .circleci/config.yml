@@ -90,7 +90,7 @@ workflows:
             only: master
     - openshift:
         requires:
-        - k8s
+        - docker
         filters:
           branches:
             only: master

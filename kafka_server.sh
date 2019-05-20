@@ -27,8 +27,8 @@ function start() {
       echo "Failed to start zookeeper server"
       return 1
     fi
-    # Are zookeeper ok
-    COUNT_DOWN_ZOO=9
+    # Is zookeeper ok
+    COUNT_DOWN_ZOO=20
 
     until [[ $COUNT_DOWN_ZOO -lt 0 ]]; do
       if [[ 'imok' == $(echo ruok | nc 127.0.0.1 $ZK_clientPort) ]]; then
