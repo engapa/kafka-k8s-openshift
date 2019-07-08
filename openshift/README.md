@@ -80,7 +80,7 @@ To build and save a docker image of kafka in your private Openshift registry jus
 
 ```bash
 $ oc create -f buildconfig.yaml
-$ oc new-app kafka-builder -p GITHUB_REF="v2.12-2.2.0" -p IMAGE_STREAM_VERSION="2.12-2.2.0"
+$ oc new-app kafka-builder -p GITHUB_REF="v2.12-2.3.0" -p IMAGE_STREAM_VERSION="2.12-2.3.0"
 ```
 If you want to get an image from another git commit:
 
@@ -93,10 +93,10 @@ $ oc start-build kafka-builder --commit=master
 ```bash
 $ oc get is -l component=zk [-n project]
 NAME    DOCKER REPO                       TAGS           UPDATED
-kafka   172.30.1.1:5000/test/kafka      2.12-2.2.0      1 days ago
+kafka   172.30.1.1:5000/test/kafka      2.12-2.3.0      1 days ago
 ```
 
-**NOTE**: If you want to use this local/private image from containers on other projects then use the "\<project\>/NAME" value as `SOURCE_IMAGE` parameter value, and use one value of "TAGS" as `KAFKA_VERSION` parameter value (e.g: test/kafka:2.12-2.2.0).
+**NOTE**: If you want to use this local/private image from containers on other projects then use the "\<project\>/NAME" value as `SOURCE_IMAGE` parameter value, and use one value of "TAGS" as `KAFKA_VERSION` parameter value (e.g: test/kafka:2.12-2.3.0).
 
 ## Topologies
 

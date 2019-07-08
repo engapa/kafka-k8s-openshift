@@ -44,14 +44,14 @@ spec:
       containers:
       - name: kafka
         imagePullPolicy: IfNotPresent
-        image: engapa/kafka:2.12-2.2.0
+        image: engapa/kafka:2.12-2.3.0
         resources:
           requests:
-            memory: 1024M
-            cpu: 750m
+            memory: 512M
+            cpu: 500m
           limits:
-            memory: 1025M
-            cpu: 750m
+            memory: 512M
+            cpu: 500m
         ports:
         - containerPort: 9092
           name: broker-port
@@ -67,9 +67,9 @@ spec:
         - name:  KAFKA_ZK_LOCAL
           value: "true"
         - name:  ZOO_HEAP_OPTS
-          value: "-Xmx512M -Xms512M"
+          value: "-Xmx250M -Xms250M"
         - name:  KAFKA_HEAP_OPTS
-          value: "-Xmx512M -Xms512M"
+          value: "-Xmx250M -Xms250M"
         - name:  SERVER_zookeeper_connection
           value: "localhost:2181"
         - name:  SERVER_zookeeper_connection_timeout_ms

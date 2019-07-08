@@ -62,13 +62,13 @@ spec:
       containers:
       - name: kafka
         imagePullPolicy: IfNotPresent
-        image: engapa/kafka:2.12-2.2.0
+        image: engapa/kafka:2.12-2.3.0
         resources:
           requests:
-            memory: 512M
+            memory: 256M
             cpu: 500m
           limits:
-            memory: 512M
+            memory: 256M
             cpu: 500m
         ports:
         - containerPort: 9092
@@ -81,7 +81,7 @@ spec:
           name: zkleader
         env:
         - name:  KAFKA_VERSION
-          value: "2.2.0"
+          value: "2.3.0"
         - name:  SCALA_VERSION
           value: "2.12"
         - name : KAFKA_REPLICAS
@@ -89,7 +89,7 @@ spec:
         - name:  KAFKA_ZK_LOCAL
           value: "false"
         - name:  KAFKA_HEAP_OPTS
-          value: "-Xmx512M -Xms512M"
+          value: "-Xmx250M -Xms250M"
         - name:  SERVER_num_partitions
           value: "1"
         - name:  SERVER_delete_topic_enable
