@@ -20,28 +20,24 @@ ENV KAFKA_HOME=${KAFKA_HOME} \
     ZK_clientPort=2181
 
 # Required packages
-RUN set -x \
-    && apk add --update --no-cache \
+RUN apk add --update --no-cache \
        bash tar gnupg openssl ca-certificates sudo
 
 # Download kafka distribution under KAFKA_HOME directory
 ADD kafka_download.sh /tmp/
 
-RUN set -x \
-    && mkdir -p $KAFKA_HOME \
+RUN mkdir -p $KAFKA_HOME \
     && chmod a+x /tmp/kafka_download.sh
 
 RUN /tmp/kafka_download.sh
 
-RUN set -x \
-    && rm -rf /tmp/kafka_download.sh \
+RUN rm -rf /tmp/kafka_download.sh \
     && apk del gnupg
 
 # Add custom scripts and configure user
 ADD kafka_*.sh $KAFKA_HOME/bin/
 
-RUN set -x \
-    && addgroup -S -g 1001 $KAFKA_GROUP \
+RUN addgroup -S -g 1001 $KAFKA_GROUP \
     && adduser -h $KAFKA_HOME -g "Kafka user" -u 1001 -D -S -G $KAFKA_GROUP $KAFKA_USER \
     && chown -R $KAFKA_USER:$KAFKA_GROUP $KAFKA_HOME \
     && chmod a+x $KAFKA_HOME/bin/kafka_*.sh \
@@ -54,6 +50,6 @@ WORKDIR $KAFKA_HOME/bin/
 
 EXPOSE $ZK_port $SERVER_port
 
-HEALTHCHECK --interval=20s --retries=10 CMD "kafka_server_status.sh"
+HEALTHCHECK --interval=10s --retries=10 CMD "kafka_server_status.sh"
 
 CMD kafka_server.sh start
