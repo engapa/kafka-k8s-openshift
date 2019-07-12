@@ -5,7 +5,8 @@ set -e
 SCALA_VERSION=${SCALA_VERSION:-"2.12"}
 KAFKA_VERSION=${KAFKA_VERSION:-"2.3.0"}
 KAFKA_IMAGE=${KAFKA_IMAGE:-"engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}"}
-ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION:-'3.4.14'}"
+ZOO_VERSION=${ZOO_VERSION:-'3.5.5'}
+ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION}"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -94,7 +95,7 @@ function test-persistent()
   # Given
   echo "Installing zookeeper cluster ..."
   file_zk=$DIR/.zk.yaml
-  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v3.4.14/openshift/zk.yaml
+  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v$ZOO_VERSION/openshift/zk.yaml
   oc create -f $file_zk
   oc new-app --template=zk -p ZOO_REPLICAS=3 -p SOURCE_IMAGE="engapa/zookeeper"
   check 3 zk
