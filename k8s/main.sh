@@ -2,8 +2,9 @@
 
 set -e
 
-MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v1.0.1"}
-KUBE_VERSION=${KUBE_VERSION:-"v1.14.1"}
+MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v1.2.0"}
+KUBE_VERSION=${KUBE_VERSION:-"v1.15.0"}
+ZOO_VERSION=${ZOO_VERSION:-'3.5.5'}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -101,7 +102,7 @@ function test-persistent()
   # A zookeeper cluster is deployed previously with three replicas
   echo "Deploying zookeeper cluster ..."
   file_zk=$DIR/.zk.yaml
-  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v3.4.14/k8s/zk.yaml
+  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v$ZOO_VERSION/k8s/zk.yaml
   kubectl create -f $file_zk
   check $file_zk 3
 
