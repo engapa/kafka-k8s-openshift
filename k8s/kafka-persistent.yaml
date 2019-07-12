@@ -21,7 +21,7 @@ spec:
   selector:
     app: kafka
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: kafka
@@ -97,7 +97,7 @@ spec:
         - name:  SERVER_log_retention_hours
           value: "2147483647"
         - name:  SERVER_zookeeper_connect
-          value: "zk-svc.default.svc.cluster.local:2181"
+          value: "zk.default.svc.cluster.local:2181"
         - name:  SERVER_log_dirs
           value: "/opt/kafka/data/logs"
         - name:  SERVER_zookeeper_connection_timeout_ms
