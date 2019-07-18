@@ -87,4 +87,8 @@ oc-test-persistent: ## Launch tests on openshift, within an external zookeeper c
 oc-cluster-clean: ## Remove openshift cluster
 	@openshift/main.sh oc-cluster-delete
 
+.PHONY: version
+version: ## Get version
+	@echo "$(SCALA_VERSION)-$(KAFKA_VERSION)"
+
 ## TODO: helm, ksonnet for deploy on kubernetes
