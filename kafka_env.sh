@@ -23,7 +23,7 @@ function zk_local_cluster() {
 
 }
 
-if $KAFKA_ZK_LOCAL;then
+if [[ "x$KAFKA_ZK_LOCAL" == "xtrue" ]];then
   export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
   export ZK_dataLogDir=${ZK_dataLogDir:-$KAFKA_HOME/zookeeper/data-log}
   export ZK_clientPort=${ZK_clientPort:-2181}
