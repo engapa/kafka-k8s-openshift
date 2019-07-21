@@ -67,15 +67,15 @@ spec:
         fsGroup: 1001
       containers:
       - name: kafka
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: engapa/kafka:2.12-2.3.0
         resources:
           requests:
             memory: 1024M
-            cpu: 750m
+            cpu: 1
           limits:
             memory: 1024M
-            cpu: 750m
+            cpu: 1
         ports:
         - containerPort: 9092
           name: server

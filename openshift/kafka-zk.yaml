@@ -71,16 +71,16 @@ parameters:
   required: true
 - name: RESOURCE_MEMORY_REQ
   description: The memory resource request.
-  value: "1024M"
+  value: "512M"
 - name: RESOURCE_MEMORY_LIMIT
   description: The limits for memory resource.
-  value: "1025M"
+  value: "512M"
 - name: RESOURCE_CPU_REQ
   description: The CPU resource request.
-  value: "750m"
+  value: "500m"
 - name: RESOURCE_CPU_LIMIT
   description: The limits for CPU resource.
-  value: "750m"
+  value: "500m"
 
 objects:
 - apiVersion: v1

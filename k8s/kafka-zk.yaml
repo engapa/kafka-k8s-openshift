@@ -47,7 +47,7 @@ spec:
         fsGroup: 1001
       containers:
       - name: kafka
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: engapa/kafka:2.12-2.3.0
         resources:
           requests:
@@ -70,10 +70,6 @@ spec:
           value: "3"
         - name:  KAFKA_ZK_LOCAL
           value: "true"
-        - name:  ZOO_HEAP_OPTS
-          value: "-Xmx250M -Xms250M"
-        - name:  KAFKA_HEAP_OPTS
-          value: "-Xmx250M -Xms250M"
         - name:  SERVER_zookeeper_connection_timeout_ms
           value: "300000"
         livenessProbe:
@@ -85,6 +81,6 @@ spec:
         readinessProbe:
           exec:
             command:
-              - kafka_server_status.sh
+            - kafka_server_status.sh
           initialDelaySeconds: 30
           timeoutSeconds: 5
