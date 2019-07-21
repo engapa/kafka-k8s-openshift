@@ -101,10 +101,9 @@ function test-persistent()
   # Given
   # A zookeeper cluster is deployed previously with three replicas
   echo "Deploying zookeeper cluster ..."
-  file_zk=$DIR/.zk.yaml
-  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v$ZOO_VERSION/k8s/zk.yaml
+  file_zk=$DIR/zk.yaml
   kubectl create -f $file_zk
-  check $file_zk 3
+  check $file_zk 1
 
   file=$DIR/kafka-persistent.yaml
   # When
