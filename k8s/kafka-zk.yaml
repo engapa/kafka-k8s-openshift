@@ -52,10 +52,10 @@ spec:
         resources:
           requests:
             memory: 512M
-            cpu: 500m
+            cpu: 300m
           limits:
             memory: 512M
-            cpu: 500m
+            cpu: 300m
         ports:
         - containerPort: 9092
           name: broker-port

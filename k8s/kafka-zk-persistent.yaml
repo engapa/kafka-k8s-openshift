@@ -90,10 +90,6 @@ spec:
           value: "3"
         - name:  KAFKA_ZK_LOCAL
           value: "true"
-        - name : ZOO_HEAP_OPTS
-          value: "-Xmx512M -Xms512M"
-        - name:  KAFKA_HEAP_OPTS
-          value: "-Xmx512M -Xms512M"
         - name:  SERVER_num_partitions
           value: "1"
         - name:  SERVER_delete_topic_enable

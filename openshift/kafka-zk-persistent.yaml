@@ -81,7 +81,7 @@ parameters:
   value: "1"
 - name: RESOURCE_CPU_LIMIT
   description: The limits for CPU resource.
-  value: "2"
+  value: "1"
 - name: LP_INITIAL_DELAY
   description: >
     LivenessProbe initial delay in seconds.

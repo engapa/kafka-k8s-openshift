@@ -71,10 +71,10 @@ parameters:
   value: "512M"
 - name: RESOURCE_CPU_REQ
   description: The CPU resource request.
-  value: "500m"
+  value: "300m"
 - name: RESOURCE_CPU_LIMIT
   description: The limits for CPU resource.
-  value: "500m"
+  value: "300m"
 
 objects:
 - apiVersion: v1
