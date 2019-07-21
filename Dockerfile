@@ -43,7 +43,7 @@ RUN addgroup -S -g 1001 $KAFKA_GROUP \
     && chmod a+x $KAFKA_HOME/bin/kafka_*.sh \
     && chmod -R a+w $KAFKA_HOME \
     && ln -s $KAFKA_HOME/bin/kafka_*.sh /usr/bin \
-    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+    && echo "${KAFKA_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER $KAFKA_USER
 WORKDIR $KAFKA_HOME/bin/
