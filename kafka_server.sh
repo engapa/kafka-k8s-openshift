@@ -19,7 +19,7 @@ function start() {
     ZOO_LOG_DIR=${ZOO_LOG_DIR:-${KAFKA_HOME}/zookeeper}
     mkdir -p $ZOO_LOG_DIR
 
-    $KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_CONF_DIR/zookeeper.properties > $ZOO_LOG_DIR/zookeeper.out 2>&1 < /dev/null &
+    KAFKA_HEAP_OPTS="${ZOO_HEAP_OPTS:-}" $KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_CONF_DIR/zookeeper.properties > $ZOO_LOG_DIR/zookeeper.out 2>&1 < /dev/null &
     ZOO_PID=$!
     if [ $? -eq 0 ]; then
       echo -n $ZOO_PID > $ZOO_PID_FILE

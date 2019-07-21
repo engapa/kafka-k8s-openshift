@@ -42,7 +42,7 @@ if [ $KAFKA_REPLICAS -gt 1 ];then
       zk_local_cluster
     fi
   elif $KAFKA_ZK_LOCAL; then
-    echo "Unable to create local Zookeeper. Name of host doesn't match with pattern: (.*)-([0-9]+). Consider using StatefulSets."
+    echo "Unable to create local Zookeeper. Name of host doesn't match with pattern: (.*)-([0-9]+). Consider Kubernetes StatefulSets."
     exit 1
   fi
 fi
