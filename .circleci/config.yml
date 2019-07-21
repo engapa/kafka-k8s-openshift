@@ -79,7 +79,6 @@ jobs:
       - run:
           name: Create a new tag
           command: |
-            env
             VERSION=v$(make version)
             git tag -d ${VERSION} > /dev/null 2>&1
             git tag ${VERSION}
