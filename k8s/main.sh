@@ -4,7 +4,6 @@ set -e
 
 MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v1.2.0"}
 KUBE_VERSION=${KUBE_VERSION:-"v1.15.1"}
-ZOO_VERSION='3.4.14'
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
