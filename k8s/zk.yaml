@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk
+  labels:
+    zk-name: zk
+    component: zk
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  ports:
+  - port: 2181
+    name: zkclient
+  - port: 2888
+    name: zkserver
+  - port: 3888
+    name: zkleader
+  clusterIP: None
+  selector:
+    zk-name: zk
+    component: zk
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zk
+  labels:
+    zk-name: zk
+    component: zk
+spec:
+  serviceName: zk
+  selector:
+    matchLabels:
+      zk-name: zk
+      component: zk
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        zk-name: zk
+        component: zk
+    spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: zk
+        imagePullPolicy: IfNotPresent
+        image: engapa/zookeeper:3.4.14
+        resources:
+          requests:
+            memory: 512M
+            cpu: 300m
+          limits:
+            memory: 512M
+            cpu: 300m
+        ports:
+          - containerPort: 2181
+            name: zkclient
+          - containerPort: 2888
+            name: zkserver
+          - containerPort: 3888
+            name: zkleader
+        env:
+          - name: ZOO_REPLICAS
+            value: "1"
+          - name: JAVA_ZK_JVMFLAG
+            value: "\"-Xmx512M -Xms512M\""
+        readinessProbe:
+          exec:
+            command:
+              - zk_status.sh
+          initialDelaySeconds: 20
+          timeoutSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+              - zk_status.sh
+          initialDelaySeconds: 20
+          timeoutSeconds: 10

@@ -5,7 +5,8 @@ set -e
 SCALA_VERSION=${SCALA_VERSION:-"2.12"}
 KAFKA_VERSION=${KAFKA_VERSION:-"2.3.0"}
 KAFKA_IMAGE=${KAFKA_IMAGE:-"engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}"}
-ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION:-'3.4.14'}"
+ZOO_VERSION='3.4.14'
+ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION}"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -34,9 +35,9 @@ function oc-cluster-run()
 
   # Waiting for cluster
   for i in {1..150}; do # timeout for 5 minutes
-     oc cluster status &> /dev/null
-     if [[ $? -ne 1 ]]; then
-        break
+    oc cluster status &> /dev/null
+    if [[ $? -ne 1 ]]; then
+       break
     fi
     sleep 2
   done
@@ -83,7 +84,7 @@ function test-zk()
   # Given
   REPLICAS=${1:-1}
   # When
-  oc new-app --template=kafka -p REPLICAS=$REPLICAS -p SOURCE_IMAGE="engapa/kafka"
+  oc new-app --template=kafka-zk -p REPLICAS=$REPLICAS -p SOURCE_IMAGE="engapa/kafka"
   # Then
   check $REPLICAS
 
@@ -93,11 +94,9 @@ function test-persistent()
 {
   # Given
   echo "Installing zookeeper cluster ..."
-  file_zk=$DIR/.zk.yaml
-  curl -o $file_zk https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v3.4.14/openshift/zk.yaml
-  oc create -f $file_zk
-  oc new-app --template=zk -p ZOO_REPLICAS=3 -p SOURCE_IMAGE="engapa/zookeeper"
-  check 3 zk
+  oc create -f https://raw.githubusercontent.com/engapa/zookeeper-k8s-openshift/v$ZOO_VERSION/openshift/zk.yaml
+  oc new-app --template=zk -p ZOO_REPLICAS=1 -p SOURCE_IMAGE="engapa/zookeeper"
+  check 1 zk
 
   echo "Installing kafka cluster with persistent storage ..."
   REPLICAS=${1:-1}

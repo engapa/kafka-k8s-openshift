@@ -14,7 +14,7 @@ parameters:
 - name: NAME
   description: Name.
   required: true
-  value: kafka
+  value: kafka-persistent
 - name: KAFKA_VERSION
   description: Kafka Version (Scala and kafka version).
   required: true
@@ -30,7 +30,7 @@ parameters:
 - name: KAFKA_HEAP_OPTS
   description: Kafka JVM Heap options. Consider value of params RESOURCE_MEMORY_REQ and RESOURCE_MEMORY_LIMIT.
   required: true
-  value: "-Xmx512M -Xms512M"
+  value: "-Xmx256M -Xms256M"
 - name: SERVER_NUM_PARTITIONS
   description: >
     The default number of log partitions per topic.
@@ -52,7 +52,7 @@ parameters:
 - name: SERVER_ZOOKEEPER_CONNECT
   description: >
     Zookeeper conection string, a list as URL with nodes separated by ','.
-  value: "zk.myproject.svc.cluster.local:2181"
+  value: "zk.myproject.svc:2181"
   required: true
 - name: SERVER_ZOOKEEPER_CONNECT_TIMEOUT
   description: >
@@ -71,10 +71,10 @@ parameters:
   value: "512M"
 - name: RESOURCE_CPU_REQ
   description: The CPU resource request.
-  value: "500m"
+  value: "300m"
 - name: RESOURCE_CPU_LIMIT
   description: The limits for CPU resource.
-  value: "500m"
+  value: "300m"
 
 objects:
 - apiVersion: v1
@@ -83,22 +83,18 @@ objects:
     name: ${NAME}
     labels:
       app: ${NAME}
+      component: kafka
     annotations:
       service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   spec:
     ports:
     - port: 9092
       name: server
-    - port: 2181
-      name: zkclient
-    - port: 2888
-      name: zkserver
-    - port: 3888
-      name: zkleader
     clusterIP: None
     selector:
       app: ${NAME}
-- apiVersion: apps/v1beta1
+      component: kafka
+- apiVersion: apps/v1
   kind: StatefulSet
   metadata:
     name: ${NAME}
@@ -108,6 +104,10 @@ objects:
   spec:
     podManagementPolicy: "Parallel"
     serviceName: ${NAME}
+    selector:
+      matchLabels:
+        app: ${NAME}
+        component: kafka
     replicas: ${REPLICAS}
     template:
       metadata:
@@ -150,12 +150,6 @@ objects:
           ports:
           - containerPort: 9092
             name: server
-          - containerPort: 2181
-            name: zkclient
-          - containerPort: 2888
-            name: zkserver
-          - containerPort: 3888
-            name: zkleader
           env:
           - name : KAFKA_REPLICAS
             value: ${REPLICAS}

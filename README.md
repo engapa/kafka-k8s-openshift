@@ -1,6 +1,5 @@
 # Kafka Docker Image 
 [![Build status](https://circleci.com/gh/engapa/kafka-k8s-openshift/tree/master.svg?style=svg "Build status")](https://circleci.com/gh/engapa/kafka-k8s-openshift/tree/master)
-[![License status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift.svg?type=shield "License status")](https://app.fossa.io/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift?ref=badge_shield)
 [![Docker Pulls](https://img.shields.io/docker/pulls/engapa/kafka.svg)](https://hub.docker.com/r/engapa/kafka/)
 [![Docker Layering](https://images.microbadger.com/badges/image/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
 [![Docker Version](https://images.microbadger.com/badges/version/engapa/kafka.svg)](https://microbadger.com/images/engapa/kafka)
@@ -169,10 +168,6 @@ In [k8s directory](k8s) there are some examples and utilities for Kubernetes
 ## Openshift
 
 In [openshift directory](openshift) there are some resources for Openshift.
-
-## License
-
-[![License status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fengapa%2Fkafka-k8s-openshift.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fengapas%2Fkafka-k8s-openshift?ref=badge_large)
 
 ## Extra Dockers
 

@@ -14,7 +14,7 @@ parameters:
 - name: NAME
   description: Name.
   required: true
-  value: kafka
+  value: kafka-zk-persistent
 - name: KAFKA_VERSION
   description: Kafka Version (Scala and kafka version).
   required: true
@@ -34,7 +34,7 @@ parameters:
 - name: KAFKA_HEAP_OPTS
   description: Kafka JVM Heap options. Consider value of params RESOURCE_MEMORY_REQ, RESOURCE_MEMORY_LIMIT and ZK_HEAP_OPTS.
   required: true
-  value: "-Xmx1448M -Xms1448M"
+  value: "-Xmx512M -Xms512M"
 - name: SERVER_NUM_PARTITIONS
   description: >
     The default number of log partitions per topic.
@@ -72,16 +72,16 @@ parameters:
   value: "1Gi"
 - name: RESOURCE_MEMORY_REQ
   description: The memory resource request.
-  value: "2Gi"
+  value: "1Gi"
 - name: RESOURCE_MEMORY_LIMIT
   description: The limits for memory resource.
-  value: "2Gi"
+  value: "1Gi"
 - name: RESOURCE_CPU_REQ
   description: The CPU resource request.
   value: "1"
 - name: RESOURCE_CPU_LIMIT
   description: The limits for CPU resource.
-  value: "2"
+  value: "1"
 - name: LP_INITIAL_DELAY
   description: >
     LivenessProbe initial delay in seconds.
@@ -94,6 +94,7 @@ objects:
     name: ${NAME}
     labels:
       app: ${NAME}
+      component: kafka
     annotations:
       service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   spec:
@@ -109,15 +110,21 @@ objects:
     clusterIP: None
     selector:
       app: ${NAME}
-- apiVersion: apps/v1beta1
+      component: kafka
+- apiVersion: apps/v1
   kind: StatefulSet
   metadata:
     name: ${NAME}
     labels:
       app: ${NAME}
+      component: kafka
   spec:
     podManagementPolicy: "Parallel"
     serviceName: ${NAME}
+    selector:
+      matchLabels:
+        app: ${NAME}
+        component: kafka
     replicas: ${REPLICAS}
     template:
       metadata:
@@ -125,24 +132,24 @@ objects:
           app: ${NAME}
           template: kafka-zk-persistent
           component: kafka
-        annotations:
-          # Use this annotation if you want allocate each pod on different node
-          # Note the number of nodes must be upper than REPLICAS parameter.
-          scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "requiredDuringSchedulingIgnoredDuringExecution": [{
-                  "labelSelector": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["${NAME}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
+#        annotations:
+#          # Use this annotation if you want allocate each pod on different node
+#          # Note the number of nodes must be upper than REPLICAS parameter.
+#          scheduler.alpha.kubernetes.io/affinity: >
+#            {
+#              "podAntiAffinity": {
+#                "requiredDuringSchedulingIgnoredDuringExecution": [{
+#                  "labelSelector": {
+#                    "matchExpressions": [{
+#                      "key": "app",
+#                      "operator": "In",
+#                      "values": ["${NAME}"]
+#                    }]
+#                  },
+#                  "topologyKey": "kubernetes.io/hostname"
+#                }]
+#              }
+#            }
       spec:
         containers:
         - name: ${NAME}

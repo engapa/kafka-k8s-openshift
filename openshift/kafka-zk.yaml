@@ -1,20 +1,20 @@
 kind: Template
 apiVersion: v1
 metadata:
-  name: kafka
+  name: kafka-zk
   annotations:
     openshift.io/display-name: Kafka [+Zookeeper] (Ephemeral)
     description: Deploy a Kafka cluster, an optional zookeeper could be deployed too.
     iconClass: icon-database
     tags: messaging,kafka
 labels:
-  template: kafka
+  template: kafka-zk
   component: kafka
 parameters:
 - name: NAME
   description: Name.
   required: true
-  value: kafka
+  value: kafka-zk
 - name: KAFKA_VERSION
   description: Kafka Version (Scala and kafka version).
   required: true
@@ -71,16 +71,16 @@ parameters:
   required: true
 - name: RESOURCE_MEMORY_REQ
   description: The memory resource request.
-  value: "1024M"
+  value: "512M"
 - name: RESOURCE_MEMORY_LIMIT
   description: The limits for memory resource.
-  value: "1025M"
+  value: "512M"
 - name: RESOURCE_CPU_REQ
   description: The CPU resource request.
-  value: "750m"
+  value: "300m"
 - name: RESOURCE_CPU_LIMIT
   description: The limits for CPU resource.
-  value: "750m"
+  value: "300m"
 
 objects:
 - apiVersion: v1
@@ -88,7 +88,7 @@ objects:
   metadata:
     name: ${NAME}
     labels:
-      component: ${NAME}
+      component: kafka
     annotations:
       service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   spec:
@@ -103,8 +103,9 @@ objects:
       name: zkleader
     clusterIP: None
     selector:
-      component: ${NAME}
-- apiVersion: apps/v1beta1
+      app: ${NAME}
+      component: kafka
+- apiVersion: apps/v1
   kind: StatefulSet
   metadata:
     name: ${NAME}
@@ -114,12 +115,16 @@ objects:
   spec:
     podManagementPolicy: "Parallel"
     serviceName: ${NAME}
+    selector:
+      matchLabels:
+        app: ${NAME}
+        component: kafka
     replicas: ${REPLICAS}
     template:
       metadata:
         labels:
           app: ${NAME}
-          template: kafka
+          template: kafka-zk
           component: kafka
       spec:
         securityContext:

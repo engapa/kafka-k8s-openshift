@@ -23,7 +23,7 @@ function zk_local_cluster() {
 
 }
 
-if $KAFKA_ZK_LOCAL;then
+if [[ "x$KAFKA_ZK_LOCAL" == "xtrue" ]];then
   export ZK_dataDir=${ZK_dataDir:-$KAFKA_HOME/zookeeper/data}
   export ZK_dataLogDir=${ZK_dataLogDir:-$KAFKA_HOME/zookeeper/data-log}
   export ZK_clientPort=${ZK_clientPort:-2181}
@@ -42,7 +42,7 @@ if [ $KAFKA_REPLICAS -gt 1 ];then
       zk_local_cluster
     fi
   elif $KAFKA_ZK_LOCAL; then
-    echo "Unable to create local Zookeeper. Name of host doesn't match with pattern: (.*)-([0-9]+). Consider using StatefulSets."
+    echo "Unable to create local Zookeeper. Name of host doesn't match with pattern: (.*)-([0-9]+). Consider Kubernetes StatefulSets."
     exit 1
   fi
 fi

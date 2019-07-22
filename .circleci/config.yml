@@ -16,20 +16,13 @@ jobs:
         command: |
           apk add --no-cache --virtual .build-deps make gcc
     - run:
-        name: build docker image
+        name: build, test and push images
         command: |
-          make docker-build
-    - run:
-        name: test of docker image
-        command: |
-          make docker-test
-    - run:
-        name: publish docker image
-        command: |
-          make docker-push
           if [ "$CIRCLE_BRANCH" == "master" ]; then
               docker build -t ${DOCKER_USERNAME}/kafka:latest .;
               docker push ${DOCKER_USERNAME}/kafka:latest;
+          else
+              make docker-build docker-test docker-push;
           fi
 
   k8s:
@@ -74,6 +67,28 @@ jobs:
         name: run tests with persistent storage
         command: make oc-test-persistent
 
+  gh-tag-release:
+    docker:
+      - image: cibuilds/github:0.12.2
+    steps:
+      - checkout
+      - run:
+          name: Install essentials
+          command: |
+            apk add --no-cache --virtual .build-deps make gcc curl
+      - run:
+          name: Create a new tag
+          command: |
+            VERSION=v$(make version)
+            git tag -f ${VERSION}
+            git remote set-url origin https://${CIRCLE_PROJECT_USERNAME}:${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+            git push -f --tags
+      - run:
+          name: Create a tag release on github
+          command: |
+            VERSION=v$(make version)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "Kafka version ${VERSION}" -delete ${VERSION} ./k8s
+
 workflows:
   version: 2
   build:
@@ -81,16 +96,28 @@ workflows:
     - docker:
         filters:
           branches:
-            only: master
+            only:
+              - /^\d+\.\d+-\d+\.\d+\.\d+$/
+              - master
     - k8s:
         requires:
-        - docker
+          - docker
         filters:
           branches:
-            only: master
+            only:
+              - /^\d+\.\d+-\d+\.\d+\.\d+$/
     - openshift:
         requires:
-        - docker
+          - docker
         filters:
           branches:
-            only: master
+            only:
+              - /^\d+\.\d+-\d+\.\d+\.\d+$/
+    - gh-tag-release:
+        requires:
+          - k8s
+          - openshift
+        filters:
+          branches:
+            only:
+              - /^\d+\.\d+-\d+\.\d+\.\d+$/

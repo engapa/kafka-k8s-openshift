@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka
+  name: kafka-zk
   labels:
     component: kafka
   annotations:
@@ -18,24 +18,28 @@ spec:
     name: zkleader
   clusterIP: None
   selector:
-    app: kafka
+    app: kafka-zk
     component: kafka
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: kafka
+  name: kafka-zk
   labels:
-    app: kafka
+    app: kafka-zk
     component: kafka
 spec:
-  serviceName: kafka
+  serviceName: kafka-zk
+  selector:
+    matchLabels:
+      app: kafka-zk
+      component: kafka
   replicas: 3
   podManagementPolicy: "Parallel"
   template:
     metadata:
       labels:
-        app: kafka
+        app: kafka-zk
         component: kafka
     spec:
       securityContext:
@@ -48,10 +52,10 @@ spec:
         resources:
           requests:
             memory: 512M
-            cpu: 500m
+            cpu: 300m
           limits:
             memory: 512M
-            cpu: 500m
+            cpu: 300m
         ports:
         - containerPort: 9092
           name: broker-port
@@ -66,12 +70,6 @@ spec:
           value: "3"
         - name:  KAFKA_ZK_LOCAL
           value: "true"
-        - name:  ZOO_HEAP_OPTS
-          value: "-Xmx250M -Xms250M"
-        - name:  KAFKA_HEAP_OPTS
-          value: "-Xmx250M -Xms250M"
-        - name:  SERVER_zookeeper_connection
-          value: "localhost:2181"
         - name:  SERVER_zookeeper_connection_timeout_ms
           value: "300000"
         livenessProbe:
@@ -83,6 +81,6 @@ spec:
         readinessProbe:
           exec:
             command:
-              - kafka_server_status.sh
+            - kafka_server_status.sh
           initialDelaySeconds: 30
           timeoutSeconds: 5

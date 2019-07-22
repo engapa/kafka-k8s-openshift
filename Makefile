@@ -5,7 +5,6 @@ DOCKER_IMAGE         ?= kafka
 
 SCALA_VERSION        ?= 2.12
 KAFKA_VERSION        ?= 2.3.0
-ZOO_VERSION          ?= 3.4.14
 
 
 .PHONY: help
@@ -29,8 +28,9 @@ docker-run: ## Create a docker container
 .PHONY: docker-test
 docker-test: docker-run ## Test for docker container
 	@until [ "$$(docker ps --filter 'name=kafka' --filter 'health=healthy' --format '{{.Names}}')" == "kafka" ]; do \
+	   sleep 10; \
+	   (docker ps --filter 'name=kafka' --format '{{.Names}}' | grep kafka > /dev/null 2>&1) || exit $$?; \
 	   echo "Checking healthy status of kafka ..."; \
-	   sleep 20; \
 	done
 
 .PHONY: docker-push
@@ -86,5 +86,9 @@ oc-test-persistent: ## Launch tests on openshift, within an external zookeeper c
 .PHONY: oc-cluster-delete
 oc-cluster-clean: ## Remove openshift cluster
 	@openshift/main.sh oc-cluster-delete
+
+.PHONY: version
+version: ## Get version
+	@echo "$(SCALA_VERSION)-$(KAFKA_VERSION)"
 
 ## TODO: helm, ksonnet for deploy on kubernetes
