@@ -2,6 +2,9 @@
 
 ### Default properties
 
+# For Zookeeper versions since 3.5, we really need "ruok" to check zookeeper cluster status, but for the future ...
+export ZK_4lw_commands_whitelist=*
+
 function zk_local_cluster() {
 
   # Required envs for replicated mode
