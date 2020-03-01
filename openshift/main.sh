@@ -5,7 +5,7 @@ set -e
 SCALA_VERSION=${SCALA_VERSION:-"2.12"}
 KAFKA_VERSION=${KAFKA_VERSION:-"2.4.0"}
 KAFKA_IMAGE=${KAFKA_IMAGE:-"engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}"}
-ZOO_VERSION='3.5.6'
+ZOO_VERSION='3.5.7'
 ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION}"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

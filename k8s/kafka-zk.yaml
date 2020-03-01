@@ -72,15 +72,15 @@ spec:
           value: "true"
         - name:  SERVER_zookeeper_connection_timeout_ms
           value: "300000"
-        livenessProbe:
-          exec:
-            command:
-            - kafka_server_status.sh
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
-        readinessProbe:
-          exec:
-            command:
-            - kafka_server_status.sh
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
+#        livenessProbe:
+#          exec:
+#            command:
+#            - kafka_server_status.sh
+#          initialDelaySeconds: 60
+#          timeoutSeconds: 60
+#        readinessProbe:
+#          exec:
+#            command:
+#            - kafka_server_status.sh
+#          initialDelaySeconds: 60
+#          timeoutSeconds: 60

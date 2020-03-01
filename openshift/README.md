@@ -9,7 +9,7 @@ It isn't necessary to clone this repo, you can use the resources directly trough
 ## Requirements
 
 - [oc](https://github.com/openshift/origin/releases) (v3.11)
-- [minihift](https://github.com/minishift/minishift) (v1.33.0)
+- [minihift](https://github.com/minishift/minishift) (v1.34.2)
 
 ### DEV environment
 
@@ -20,7 +20,7 @@ After install the command client check everything is alright to continue:
 
 ```bash
 $ minishift version
-minishift v1.33.0+ba29431
+minishift v1.34.2+83ebaab
 $ minishift start [options]
 ...
 $ minishift openshift version
