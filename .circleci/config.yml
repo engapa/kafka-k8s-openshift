@@ -13,7 +13,7 @@ jobs:
     - run:
         name: Install essentials
         command: |
-          apk add --no-cache --virtual .build-deps make gcc conntrack
+          apk add --no-cache --virtual .build-deps make gcc
     - run:
         name: build, test and push images
         command: |
@@ -29,6 +29,9 @@ jobs:
       image: circleci/classic:201808-01
     steps:
       - checkout
+      - run:
+          name: update pkgs
+          command: sudo apt-get update -y && sudo apt-get install -f -y conntrack
       - run:
           name: install minikube and kubectl
           command: make minikube-install
