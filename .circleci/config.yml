@@ -31,7 +31,7 @@ jobs:
       - checkout
       - run:
           name: update pkgs
-          command: sudo apt-get update && sudo apt-get install --allow -y conntrack
+          command: sudo apt-get update && sudo apt-get install -f -y conntrack
       - run:
           name: install minikube and kubectl
           command: make minikube-install
