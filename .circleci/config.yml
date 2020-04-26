@@ -13,7 +13,7 @@ jobs:
     - run:
         name: Install essentials
         command: |
-          apk add --no-cache --virtual .build-deps make gcc
+          apk add --no-cache --virtual .build-deps make gcc conntrack
     - run:
         name: build, test and push images
         command: |
