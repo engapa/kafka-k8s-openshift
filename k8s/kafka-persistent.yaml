@@ -61,7 +61,7 @@ spec:
       containers:
       - name: kafka
         imagePullPolicy: IfNotPresent
-        image: engapa/kafka:2.12-2.5.0
+        image: engapa/kafka:2.13-2.5.0
         resources:
           requests:
             memory: 512M

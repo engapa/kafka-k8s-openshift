@@ -2,8 +2,8 @@
 
 set -e
 
-MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v1.7.3"}
-KUBE_VERSION=${KUBE_VERSION:-"v1.17.3"}
+MINIKUBE_VERSION=${MINIKUBE_VERSION:-"v1.9.2"}
+KUBE_VERSION=${KUBE_VERSION:-"v1.18.2"}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -30,7 +30,7 @@ function minikube-install()
   # Download minikube
   curl -L -o minikube https://storage.googleapis.com/minikube/releases/${MINIKUBE_VERSION}/minikube-$DISTRO-amd64
   chmod +x minikube
-  sudo mv minikube /usr/local/bin/
+  sudo install minikube /usr/local/bin/
 
 }
 
@@ -43,7 +43,7 @@ function minikube-run()
   export CHANGE_MINIKUBE_NONE_USER=true
   export KUBECONFIG=$HOME/.kube/config
 
-  sudo -E minikube start --vm-driver=none --cpus 2 --memory 3062 --kubernetes-version=${KUBE_VERSION}
+  sudo -E minikube start --driver=none --cpus 2 --memory 3062 --kubernetes-version=${KUBE_VERSION}
 
   # this for loop waits until kubectl can access the api server that Minikube has created
   for i in {1..150}; do # timeout for 5 minutes
