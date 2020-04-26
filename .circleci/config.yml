@@ -26,7 +26,7 @@ jobs:
 
   k8s:
     machine:
-      image: circleci/classic:201808-01
+      image: ubuntu-1604:201903-01
     steps:
       - checkout
       - run:
@@ -50,7 +50,7 @@ jobs:
 
   openshift:
     machine:
-      image: circleci/classic:201808-01
+      image: ubuntu-1604:201903-01
     steps:
     - checkout
     - run:
