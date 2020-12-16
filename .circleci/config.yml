@@ -71,7 +71,7 @@ jobs:
 
   gh-tag-release:
     docker:
-      - image: cibuilds/github:0.12.2
+      - image: cibuilds/github:0.13
     steps:
       - checkout
       - run:

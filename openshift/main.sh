@@ -3,9 +3,9 @@
 set -e
 
 SCALA_VERSION=${SCALA_VERSION:-"2.13"}
-KAFKA_VERSION=${KAFKA_VERSION:-"2.5.0"}
+KAFKA_VERSION=${KAFKA_VERSION:-"2.6.0"}
 KAFKA_IMAGE=${KAFKA_IMAGE:-"engapa/kafka:${SCALA_VERSION}-${KAFKA_VERSION}"}
-ZOO_VERSION='3.6.0'
+ZOO_VERSION='3.6.2'
 ZK_IMAGE="engapa/zookeeper:${ZOO_VERSION}"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -52,7 +52,7 @@ function oc-cluster-run()
 function build_local_image()
 {
 
-  oc new-build --name kafka --strategy docker --binary --docker-image "openjdk:8-jre-alpine"
+  oc new-build --name kafka --strategy docker --binary --docker-image "openjdk:11-jre-alpine"
   oc start-build kafka --from-dir $DIR/.. --follow
 
 }

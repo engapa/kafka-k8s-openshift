@@ -1,11 +1,11 @@
-FROM openjdk:8-jre-alpine
+FROM openjdk:11-jre-alpine
 
 MAINTAINER Enrique Garcia <engapa@gmail.com>
 
 ARG KAFKA_HOME=/opt/kafka
 ARG KAFKA_USER=kafka
 ARG KAFKA_GROUP=kafka
-ARG KAFKA_VERSION="2.5.0"
+ARG KAFKA_VERSION="2.6.0"
 ARG SCALA_VERSION="2.13"
 
 ENV KAFKA_HOME=${KAFKA_HOME} \

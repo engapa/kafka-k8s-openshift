@@ -4,7 +4,7 @@ DOCKER_ORG           ?= engapa
 DOCKER_IMAGE         ?= kafka
 
 SCALA_VERSION        ?= 2.13
-KAFKA_VERSION        ?= 2.5.0
+KAFKA_VERSION        ?= 2.6.0
 
 
 .PHONY: help
@@ -56,7 +56,7 @@ minikube-test-persistent: ## Launch tests on minikube, within an external zookee
 	@k8s/main.sh test-persistent
 
 .PHONY: minikube-clean-resources
-minikube-clean-resources: ## Clean kafka and zookeeper respources
+minikube-clean-resources: ## Clean kafka and zookeeper resources
 	@k8s/main.sh clean-resources
 
 .PHONY: minikube-delete
@@ -76,7 +76,7 @@ oc-test-zk: ## Launch tests on openshift, within an internal zookeeper cluster
 	@openshift/main.sh test-zk
 
 .PHONY: oc-clean-resources
-oc-clean-resources: ## Clean kafka and zookeeper respources
+oc-clean-resources: ## Clean kafka and zookeeper resources
 	@openshift/main.sh clean-resources
 
 .PHONY: oc-test-persistent
