@@ -52,7 +52,7 @@ function oc-cluster-run()
 function build_local_image()
 {
 
-  oc new-build --name kafka --strategy docker --binary --docker-image "openjdk:11-jre-alpine"
+  oc new-build --name kafka --strategy docker --binary --docker-image "openjdk:11-jre-slim-buster"
   oc start-build kafka --from-dir $DIR/.. --follow
 
 }
