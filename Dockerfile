@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-alpine
+FROM openjdk:11-jre-slim-buster
 
 MAINTAINER Enrique Garcia <engapa@gmail.com>
 
@@ -20,30 +20,27 @@ ENV KAFKA_HOME=${KAFKA_HOME} \
     ZK_clientPort=2181
 
 # Required packages
-RUN apk add --update --no-cache \
-       bash tar gnupg openssl ca-certificates sudo
+RUN apt update && \
+    apt install -y tar gnupg openssl ca-certificates wget
+
+# User and group
+RUN groupadd -g 1001 $KAFKA_GROUP \
+    && useradd -d $KAFKA_HOME -g $KAFKA_GROUP -u 1001 -G sudo -m $KAFKA_USER\
+    && echo "${KAFKA_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Download kafka distribution under KAFKA_HOME directory
-ADD kafka_download.sh /tmp/
+ADD kafka_download.sh /tmp/kafka_download.sh
+RUN chmod a+x /tmp/kafka_download.sh \
+    && /tmp/kafka_download.sh
 
-RUN mkdir -p $KAFKA_HOME \
-    && chmod a+x /tmp/kafka_download.sh
-
-RUN /tmp/kafka_download.sh
-
-RUN rm -rf /tmp/kafka_download.sh \
-    && apk del gnupg
-
-# Add custom scripts and configure user
+# Add custom scripts
 ADD kafka_*.sh $KAFKA_HOME/bin/
 
-RUN addgroup -S -g 1001 $KAFKA_GROUP \
-    && adduser -h $KAFKA_HOME -g "Kafka user" -u 1001 -D -S -G $KAFKA_GROUP $KAFKA_USER \
-    && chown -R $KAFKA_USER:$KAFKA_GROUP $KAFKA_HOME \
+# Permissions
+RUN chown -R $KAFKA_USER:$KAFKA_GROUP $KAFKA_HOME \
     && chmod a+x $KAFKA_HOME/bin/kafka_*.sh \
-    && chmod -R a+w $KAFKA_HOME \
-    && ln -s $KAFKA_HOME/bin/kafka_*.sh /usr/bin \
-    && echo "${KAFKA_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    && chmod -R a+w $KAFKA_HOME\
+    && ln -s $KAFKA_HOME/bin/kafka_*.sh /usr/bin
 
 USER $KAFKA_USER
 WORKDIR $KAFKA_HOME/bin/
