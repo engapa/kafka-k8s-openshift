@@ -21,7 +21,7 @@ ENV KAFKA_HOME=${KAFKA_HOME} \
 
 # Required packages
 RUN apt update && \
-    apt install -y tar gnupg openssl ca-certificates wget
+    apt install -y tar gnupg openssl ca-certificates wget netcat sudo
 
 # User and group
 RUN groupadd -g 1001 $KAFKA_GROUP \
