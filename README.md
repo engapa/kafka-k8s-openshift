@@ -20,7 +20,7 @@ To get your own image:
 ```bash
 $ export KAFKA_HOME="/opt/kafka"
 $ export SCALA_VERSION="2.13"
-$ export KAFKA_VERSION="2.6.0"
+$ export KAFKA_VERSION="2.7.0"
 $ docker build --build-arg SCALA_VERSION=$SCALA_VERSION --build-arg KAFKA_VERSION=$KAFKA_VERSION --build-arg KAFKA_HOME=$KAFKA_HOME \
 -t your-org/kafka:${SCALA_VERSION}-${KAFKA_VERSION} .
 ```

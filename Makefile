@@ -4,7 +4,7 @@ DOCKER_ORG           ?= engapa
 DOCKER_IMAGE         ?= kafka
 
 SCALA_VERSION        ?= 2.13
-KAFKA_VERSION        ?= 2.6.0
+KAFKA_VERSION        ?= 2.7.0
 
 
 .PHONY: help
