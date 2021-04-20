@@ -18,7 +18,6 @@ spec:
   clusterIP: None
   selector:
     zk-name: zk
-    component: zk
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -34,6 +33,7 @@ spec:
       zk-name: zk
       component: zk
   replicas: 1
+  podManagementPolicy: "Parallel"
   template:
     metadata:
       labels:
@@ -69,12 +69,14 @@ spec:
         readinessProbe:
           exec:
             command:
-              - zk_status.sh
+              - zkServer.sh
+              - status
           initialDelaySeconds: 20
           timeoutSeconds: 10
         livenessProbe:
           exec:
             command:
-              - zk_status.sh
+              - zkServer.sh
+              - status
           initialDelaySeconds: 20
           timeoutSeconds: 10
