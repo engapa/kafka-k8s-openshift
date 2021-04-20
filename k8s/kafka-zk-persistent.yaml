@@ -127,6 +127,7 @@ spec:
       name: kafka-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "standard"
       resources:
         requests:
           storage: 1Gi
@@ -134,6 +135,7 @@ spec:
       name: zk-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "standard"
       resources:
         requests:
           storage: 1Gi
@@ -141,6 +143,7 @@ spec:
       name: zk-datalog
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "standard"
       resources:
         requests:
           storage: 1Gi
