@@ -73,7 +73,7 @@ function check()
       echo "ERROR: Max number of attempts was reached (${MAX_ATTEMPTS})"
       exit 1
     fi
-    READY_REPLICAS=$(oc get statefulset -l component=${2:-kafka} -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.currentReplicas}' 2>&1)
+    READY_REPLICAS=$(oc get statefulset -l component=${2:-kafka} -o jsonpath='{.items[?(@.kind=="StatefulSet")].status.readyReplicas}' 2>&1)
    echo "[${ATTEMPTS}/${MAX_ATTEMPTS}] - Ready replicas : ${READY_REPLICAS:-0}/$REPLICAS ... "
   done
   oc get all

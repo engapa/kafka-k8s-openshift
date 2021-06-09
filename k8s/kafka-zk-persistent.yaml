@@ -106,15 +106,15 @@ spec:
         readinessProbe:
           exec:
             command:
-            - kafka_server_status.sh
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
+              - kafka_server_status.sh
+          initialDelaySeconds: 60
+          timeoutSeconds: 30
         livenessProbe:
           exec:
             command:
-            - kafka_server_status.sh
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
+              - kafka_server_status.sh
+          initialDelaySeconds: 60
+          timeoutSeconds: 30
         volumeMounts:
         - name: kafka-data
           mountPath: /opt/kafka/data
@@ -127,7 +127,6 @@ spec:
       name: kafka-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "standard"
       resources:
         requests:
           storage: 1Gi
@@ -135,7 +134,6 @@ spec:
       name: zk-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "standard"
       resources:
         requests:
           storage: 1Gi
@@ -143,7 +141,6 @@ spec:
       name: zk-datalog
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "standard"
       resources:
         requests:
           storage: 1Gi

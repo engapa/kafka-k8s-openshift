@@ -75,12 +75,12 @@ spec:
 #        livenessProbe:
 #          exec:
 #            command:
-#            - kafka_server_status.sh
+#              - kafka_server_status.sh
 #          initialDelaySeconds: 60
 #          timeoutSeconds: 60
 #        readinessProbe:
 #          exec:
 #            command:
-#            - kafka_server_status.sh
+#              - kafka_server_status.sh
 #          initialDelaySeconds: 60
 #          timeoutSeconds: 60
